@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useStoreContext, createEmptyPayload } from '@/utils/storeContext';
+import { useStoreContext, createEmptyPayload, StorePayload } from '@/utils/storeContext';
 import { Button } from '@/components/ui/button';
 import { Socket ,io } from 'socket.io-client';
+import { buildStorePayload, DEFAULT_IMAGE_DATA } from '../socket/page';
 // Type for message data that's safely serializable
 type MessageData = {
   [key: string]: string | number | boolean | null | undefined | MessageData | Array<string | number | boolean | null | undefined | MessageData>;
@@ -11,19 +12,21 @@ type MessageData = {
 export default function PayloadPage() {
   const { payload } = useStoreContext();
   
+
   // Initialize local payload from localStorage first
-  const [localPayload, setLocalPayload] = useState(() => {
+  const [localPayload, setLocalPayload] = useState<StorePayload>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('store-payload');
       if (stored) {
         try {
-          return JSON.parse(stored);
+          return JSON.parse(stored) as StorePayload;
         } catch (err) {
           console.error('Invalid payload in localStorage:', err);
+          return createEmptyPayload();
         }
       }
     }
-    return payload;
+    return createEmptyPayload();
   });
 
   
@@ -61,7 +64,8 @@ export default function PayloadPage() {
   };
 
   useEffect(() => {
-    const serverUrl = 'ws://51.112.151.1';
+        // const serverUrl = "http://51.112.151.1";
+    const serverUrl = 'http://51.112.151.1';
     socketRef.current = io(serverUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -144,23 +148,7 @@ export default function PayloadPage() {
 
 // useEffect(() => {
 //   // Function to create Shopify store - This sends the main event to server
-//   const createShopifyStore = () => {
-//     if (socketRef.current && socketRef.current.connected) {
-//       // Use localPayload which persists from localStorage
-//       const payloadToSend = Object.keys(localPayload || {}).length > 0 ? localPayload : payload;
-//       const jsonPayload = JSON.stringify(payloadToSend);
-
-//       socketRef.current.emit('shopify:create', jsonPayload,); 
-
-//       console.log('🚀 Sent shopify:create event to server with payload:', payloadToSend);
-//       addMessage('info', '⏳ Waiting for server response...');
-
-//       setShopifyStatus((prev) => ({ ...prev, isProcessing: true }));
-
-//     } else {
-//       console.error('Socket.IO is not connected');
-//       addMessage('error', 'Cannot create store - Socket.IO not connected');
-//     }
+  
 //   };
   
 //   // Only create store if we have payload data and socket is connected
@@ -171,7 +159,19 @@ export default function PayloadPage() {
 
   // Save to localStorage when payload is updated (only if it has meaningful data)
  
- 
+ const createShopifyStore = () => {
+    if (socketRef.current && socketRef.current.connected) {
+      const storeData = buildStorePayload(localPayload);
+      socketRef.current.emit('shopify:create', JSON.stringify(storeData), storeData.imageData ??  DEFAULT_IMAGE_DATA);
+      console.log('🚀 Sent shopify:create event to server with payload:', storeData);
+      addMessage('client:sent', '🚀 Shopify store creation request sent to server', storeData as unknown as MessageData);
+      addMessage('info', '⏳ Waiting for server response...');
+      setShopifyStatus((prev) => ({ ...prev, isProcessing: true }));
+    } else {
+      console.error('Socket.IO is not connected');
+      addMessage('error', 'Cannot create store - Socket.IO not connected');
+    }
+  }
  
   useEffect(() => {
     // Check if payload has any non-empty values
@@ -190,14 +190,14 @@ export default function PayloadPage() {
 
   return (
     <div className="p-3">
-      <h1 className="text-xl font-semibold mb-4">Payload Preview</h1>
+      {/* <h1 className="text-xl font-semibold mb-4">Payload Preview</h1>
       {Object.keys(localPayload).length > 0 ? (
         <>
           <pre className="bg-gray-100 p-4 rounded text-sm">{JSON.stringify(localPayload, null, 2)}</pre>
         </>
       ) : (
         <p className="text-gray-500">No payload available.</p>
-      )}
+      )} */}
        {/* Socket.IO Status */}
       <div className="mb-4 p-4 bg-gray-100 rounded-lg">
         <div className="flex items-center justify-between">
@@ -209,7 +209,7 @@ export default function PayloadPage() {
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
           <Button
-           // onClick={createShopifyStore}
+            onClick={createShopifyStore}
             disabled={!isConnected || shopifyStatus.isProcessing}
             className="bg-blue-600 hover:bg-blue-700"
           >

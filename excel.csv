@@ -1,0 +1,4 @@
+title,handle,descriptionHtml,sortOrder,appliedDisjunctively,rules_column,rules_relation,rules_condition
+Example Collection Title,example-collection,<p>Collection created from CSV import</p>,BEST_SELLING,false,TITLE,CONTAINS,PRODUCT
+Featured Products,featured-products,<p>Featured products tagged for promotion</p>,ALPHA_ASC,false,TAG,EQUALS,featured
+Summer Sale,summer-sale,<p>All products on summer sale</p>,PRICE_DESC,false,TAG,EQUALS,sale

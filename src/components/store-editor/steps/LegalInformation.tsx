@@ -1,12 +1,12 @@
 import { UseFormReturn } from 'react-hook-form';
-import { StoreFormData } from '../StoreCreatorForm';
+import { StoreEditorFormData } from '../StoreCreatorForm';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 
 type LegalInformationProps = {
-  form: UseFormReturn<StoreFormData>;
+  form: UseFormReturn<StoreEditorFormData>;
   nextStep: () => void;
   prevStep: () => void;
 };
@@ -62,12 +62,12 @@ export default function LegalInformation({ form, nextStep, prevStep }: LegalInfo
         />
 
 
-        <div className="flex justify-between">
-          <Button type="button" variant="outline" onClick={prevStep} className='text-black'>
+        <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
+          <Button type="button" variant="outline" onClick={prevStep} className='text-black w-full sm:w-auto'>
             Previous
           </Button>
-          <Button type="button" onClick={nextStep} className='bg-black'>
-            Next
+          <Button type="button" onClick={nextStep} className='bg-black w-full sm:w-auto'>
+            Submit
           </Button>
         </div>
       </div>

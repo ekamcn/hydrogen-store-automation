@@ -93,7 +93,50 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
           )}
         />
 
+
         <FormField
+          control={form.control}
+          name="VITE_SHOPIFY_URL"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Shopify Store URL *</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="store-name"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter only the store name from your Shopify admin URL. For example, if your URL is <code>https://admin.shopify.com/store/hxzfsw-2e/products</code>, enter <strong>hxzfsw-2e</strong> in the input box.
+              </p>
+
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="VITE_SHOPIFY_ADMIN_ACCESS_TOKEN"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Shopify Admin Access Token *</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="shpat_xxxxxxxxxxxxxxxxxxxxxxxx"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+              <p className="text-xs text-gray-500 mt-1">
+                Generate this token in your Shopify admin under Settings &gt; Apps and sales channels&gt; Develop Apps &gt; Create an app
+              </p>
+            </FormItem>
+          )}
+        />
+         <FormField
           control={form.control}
           name="VITE_SHOPIFY_EMAIL"
           render={({ field }) => (
@@ -113,7 +156,7 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={nextStep} className="px-8">
+        <Button onClick={nextStep} className="px-8 bg-black">
           Next
         </Button>
       </div>

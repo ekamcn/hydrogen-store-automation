@@ -7,6 +7,8 @@ export type StorePayload = {
   VITE_CUSTOMER_SERVICE_PHONE: string;
   VITE_DOMAIN_NAME: string;
   VITE_SHOPIFY_EMAIL?: string;
+  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN?: string;
+  VITE_SHOPIFY_URL?: string;
   VITE_CATEGORY: string;
   VITE_LANGUAGE: string;
   VITE_COLOR1: string;
@@ -20,7 +22,8 @@ export type StorePayload = {
   VITE_CHECKOUT_ID: string;
   VITE_SQUARE_LOGO?: string;
   VITE_OFFER_ID_TYPE: string;
-  [key: string]: string | undefined; // allow dynamic offer ids too
+  customOfferIds?: Record<string, string>;
+  [key: string]: string | undefined | Record<string, string>; 
 };
 
 type StoreContextType = {
@@ -37,6 +40,8 @@ export const createEmptyPayload = (): StorePayload => ({
   VITE_CUSTOMER_SERVICE_PHONE: '',
   VITE_DOMAIN_NAME: '',
   VITE_SHOPIFY_EMAIL: '',
+  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: '',
+  VITE_SHOPIFY_URL: '',
   VITE_CATEGORY: '',
   VITE_LANGUAGE: '',
   VITE_COLOR1: '',
@@ -50,6 +55,7 @@ export const createEmptyPayload = (): StorePayload => ({
   VITE_CHECKOUT_ID: '',
   VITE_SQUARE_LOGO: '',
   VITE_OFFER_ID_TYPE: '',
+  customOfferIds: {},
 });
 
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
