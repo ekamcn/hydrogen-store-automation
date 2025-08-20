@@ -1,9 +1,9 @@
-name: Deploy to EC2
+name: Deploy Next.js to EC2
 
 on:
   push:
     branches:
-      - main   # run when code is pushed to main branch
+      - main   # deploy on push to main
 
 jobs:
   deploy:
@@ -20,11 +20,27 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2
+      - name: Deploy Next.js App
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /var/www/app   # change to your app folder
-            git pull origin main
-            npm install --production
-            pm2 restart all   # or systemctl restart your service
+            cd /var/www/nextapp
+
+            # Pull latest code
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/your-username/your-repo.git .
+            else
+              git reset --hard
+              git pull origin main
+            fi
+
+            # Install dependencies & build Next.js
+            npm install
+            npm run build
+
+            # Run with PM2
+            pm2 stop nextapp || true
+            pm2 start "npm run start" --name nextapp
+
+            # Save PM2 so it restarts after reboot
+            pm2 save
           EOF
