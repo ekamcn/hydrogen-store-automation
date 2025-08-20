@@ -67,9 +67,9 @@ export default function CsvCollectionPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
-  const [selectedPublications, setSelectedPublications] = useState<Array<{ publicationId: string; publicationName: string }>>(
-    []
-  );
+  const [selectedPublications, setSelectedPublications] = useState<
+    Array<{ publicationId: string; publicationName: string }>
+  >([]);
   const [apiErrors, setApiErrors] = useState<{ [key: string]: string }>({});
   const [csvData, setCsvData] = useState<CSVRowData[]>([]);
   const [failedRecords, setFailedRecords] = useState<FailedCollectionRecord[]>(
@@ -97,15 +97,27 @@ export default function CsvCollectionPage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          if (typeof errorData === 'object' && errorData !== null && 'message' in errorData) {
-            throw new Error((errorData as { message?: string }).message || "Failed to fetch publications");
+          if (
+            typeof errorData === "object" &&
+            errorData !== null &&
+            "message" in errorData
+          ) {
+            throw new Error(
+              (errorData as { message?: string }).message ||
+                "Failed to fetch publications"
+            );
           } else {
             throw new Error("Failed to fetch publications");
           }
         }
 
         const data = await response.json();
-        if (typeof data === 'object' && data !== null && 'data' in data && (data as any).data.publications) {
+        if (
+          typeof data === "object" &&
+          data !== null &&
+          "data" in data &&
+          (data as any).data.publications
+        ) {
           const publicationsData = (data as any).data.publications.edges.map(
             (edge: { node: { id: string; name: string } }) => ({
               id: edge.node.id,
@@ -116,11 +128,13 @@ export default function CsvCollectionPage() {
 
           // Select all publications by default
           const allPublicationIds = publicationsData.map(
-            (pub: Publication) => ({publicationId:pub.id,publicationName:pub.name})
+            (pub: Publication) => ({
+              publicationId: pub.id,
+              publicationName: pub.name,
+            })
           );
           // console.log("Selecting all publications:", allPublicationNames);
           setSelectedPublications(allPublicationIds);
-
         } else {
           setPublications([]);
         }
@@ -146,14 +160,21 @@ export default function CsvCollectionPage() {
     setApiErrors({});
   };
 
-  const handlePublicationToggle = (publication: { publicationId: string; publicationName: string }) => {
+  const handlePublicationToggle = (publication: {
+    publicationId: string;
+    publicationName: string;
+  }) => {
     console.log("Toggling publication:", publication);
     setSelectedPublications((prev) => {
-      const exists = prev.some((p) => p.publicationId === publication.publicationId);
+      const exists = prev.some(
+        (p) => p.publicationId === publication.publicationId
+      );
       console.log("Publication exists:", exists, "Current publications:", prev);
-  
+
       if (exists) {
-        const filtered = prev.filter((p) => p.publicationId !== publication.publicationId);
+        const filtered = prev.filter(
+          (p) => p.publicationId !== publication.publicationId
+        );
         console.log("Removed publication, new list:", filtered);
         return filtered;
       } else {
@@ -163,8 +184,8 @@ export default function CsvCollectionPage() {
       }
     });
   };
-  
-console.log(selectedPublications,"selectedPublications")
+
+  console.log(selectedPublications, "selectedPublications");
   // Helper functions for selecting/deselecting all publications
   const selectAllPublications = () => {
     const allPublicationIds = publications.map((pub: Publication) => ({
@@ -173,7 +194,6 @@ console.log(selectedPublications,"selectedPublications")
     }));
     setSelectedPublications(allPublicationIds);
   };
-  
 
   const deselectAllPublications = () => {
     setSelectedPublications([]);
@@ -193,7 +213,7 @@ console.log(selectedPublications,"selectedPublications")
       setError("Please select at least one publication channel");
       return;
     }
-    
+
     console.log("Processing with publications:", selectedPublications);
 
     // Reset states
@@ -216,21 +236,26 @@ console.log(selectedPublications,"selectedPublications")
         throw new Error("CSV file must contain at least one row of data");
       }
       setCsvData(parsedCsvData);
-      console.log('above response')
+      console.log("above response");
       // Send all parsedCsvData in a single API call
       const response = await fetch("/api/upload-products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          parsedCsvData, 
-          publications: selectedPublications 
+        body: JSON.stringify({
+          parsedCsvData,
+          publications: selectedPublications,
         }),
       });
       console.log(response,"productsCsv")
       const result: any = await response.json();
       if (!response.ok || !result.success) {
         setError(result.message || "Failed to upload products");
-        setFailedRecords(parsedCsvData.map((row: any) => ({ ...row, error: result.message || "Upload failed" })));
+        setFailedRecords(
+          parsedCsvData.map((row: any) => ({
+            ...row,
+            error: result.message || "Upload failed",
+          }))
+        );
         setProcessingStatus({
           total: parsedCsvData.length,
           processed: parsedCsvData.length,
@@ -349,32 +374,35 @@ console.log(selectedPublications,"selectedPublications")
 
         {publications.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {publications.map(
-              (pub) => (
-                // console.log("Rendering publication:", pub),
-                (
-                  <div
-                    key={pub.id}
-                    className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handlePublicationToggle({ publicationId: pub.id, publicationName: pub.name })}
-                  >
-                    <input
-                      type="checkbox"
-                      id={pub.id}
-                      checked={selectedPublications.some(p => p.publicationId === pub.id)}
-                      onChange={() => {}} // Handled by parent div onClick
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <label
-                      htmlFor={pub.id}
-                      className="text-sm cursor-pointer select-none"
-                    >
-                      {pub.name}
-                    </label>
-                  </div>
-                )
-              )
-            )}
+            {publications.map((pub) => (
+              // console.log("Rendering publication:", pub),
+              <div
+                key={pub.id}
+                className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                onClick={() =>
+                  handlePublicationToggle({
+                    publicationId: pub.id,
+                    publicationName: pub.name,
+                  })
+                }
+              >
+                <input
+                  type="checkbox"
+                  id={pub.id}
+                  checked={selectedPublications.some(
+                    (p) => p.publicationId === pub.id
+                  )}
+                  onChange={() => {}} // Handled by parent div onClick
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor={pub.id}
+                  className="text-sm cursor-pointer select-none"
+                >
+                  {pub.name}
+                </label>
+              </div>
+            ))}
           </div>
         ) : (
           <p>

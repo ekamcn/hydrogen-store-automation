@@ -71,14 +71,16 @@ export default function CsvCollectionPage() {
   const [selectedPublications, setSelectedPublications] = useState<string[]>(
     []
   );
-  const [selectedPublicationName, setSelectedPublicationName] = useState<string[]>([]);
+  const [selectedPublicationName, setSelectedPublicationName] = useState<
+    string[]
+  >([]);
 
   const [apiErrors, setApiErrors] = useState<{ [key: string]: string }>({});
   const [csvData, setCsvData] = useState<CSVRowData[]>([]);
   const [failedRecords, setFailedRecords] = useState<FailedCollectionRecord[]>(
     []
   );
-  const [publicationId,setPublicationId] = useState<string>("");
+  const [publicationId, setPublicationId] = useState<string>("");
   const [processingStatus, setProcessingStatus] = useState<{
     total: number;
     processed: number;
@@ -101,15 +103,27 @@ export default function CsvCollectionPage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          if (typeof errorData === 'object' && errorData !== null && 'message' in errorData) {
-            throw new Error((errorData as { message?: string }).message || "Failed to fetch publications");
+          if (
+            typeof errorData === "object" &&
+            errorData !== null &&
+            "message" in errorData
+          ) {
+            throw new Error(
+              (errorData as { message?: string }).message ||
+                "Failed to fetch publications"
+            );
           } else {
             throw new Error("Failed to fetch publications");
           }
         }
 
         const data = await response.json();
-        if (typeof data === 'object' && data !== null && 'data' in data && (data as any).data.publications) {
+        if (
+          typeof data === "object" &&
+          data !== null &&
+          "data" in data &&
+          (data as any).data.publications
+        ) {
           const publicationsData = (data as any).data.publications.edges.map(
             (edge: { node: { id: string; name: string } }) => ({
               id: edge.node.id,
@@ -123,8 +137,10 @@ export default function CsvCollectionPage() {
             (pub: Publication) => pub.id
           );
 
-          const allPublicationsName = publicationsData.map((pub:Publication)=> pub.name)
-          console.log(allPublicationsName,"all")
+          const allPublicationsName = publicationsData.map(
+            (pub: Publication) => pub.name
+          );
+          console.log(allPublicationsName, "all");
           console.log("Selecting all publications:", allPublicationIds);
           setSelectedPublications(allPublicationIds);
           setSelectedPublicationName(allPublicationsName);
@@ -153,7 +169,10 @@ export default function CsvCollectionPage() {
     setApiErrors({});
   };
 
-  const handlePublicationToggle = (publicationId: string, publicationName: string) => {
+  const handlePublicationToggle = (
+    publicationId: string,
+    publicationName: string
+  ) => {
     setSelectedPublications((prev) => {
       if (prev.includes(publicationId)) {
         return prev.filter((id) => id !== publicationId);
@@ -161,7 +180,7 @@ export default function CsvCollectionPage() {
         return [...prev, publicationId];
       }
     });
-    
+
     setSelectedPublicationName((prev) => {
       if (prev.includes(publicationName)) {
         return prev.filter((name) => name !== publicationName);
@@ -174,7 +193,9 @@ export default function CsvCollectionPage() {
   // Helper functions for selecting/deselecting all publications
   const selectAllPublications = () => {
     const allPublicationIds = publications.map((pub: Publication) => pub.id);
-    const allPublicationNames = publications.map((pub: Publication) => pub.name);
+    const allPublicationNames = publications.map(
+      (pub: Publication) => pub.name
+    );
     setSelectedPublications(allPublicationIds);
     setSelectedPublicationName(allPublicationNames);
   };
@@ -198,7 +219,7 @@ export default function CsvCollectionPage() {
       setError("Please select at least one publication channel");
       return;
     }
-  
+
     // Reset states
     setLoading(true);
     setError("");
@@ -211,17 +232,17 @@ export default function CsvCollectionPage() {
       successful: 0,
       failed: 0,
     });
-  
+
     try {
       // Parse CSV file using the utility function
       const parsedCsvData = await parseCsvToJson(file);
-  
+
       if (!parsedCsvData || parsedCsvData.length < 1) {
         throw new Error("CSV file must contain at least one row of data");
       }
-  
+
       setCsvData(parsedCsvData);
-  
+
       // Get selected publication names
       const selectedPublicationNames = selectedPublications
         .map((pubId) => {
@@ -229,10 +250,10 @@ export default function CsvCollectionPage() {
           return pub ? pub.name : null;
         })
         .filter((name): name is string => name !== null);
-  
+
       console.log("Selected Publication IDs:", selectedPublications);
       console.log("Selected Publication Names:", selectedPublicationNames);
-  
+
       // Create collections and rules using the data from CSV
       const collectionsData = parsedCsvData.map((row: CSVRowData) => {
         const formatRelation = (relation: string): string => {
@@ -263,17 +284,17 @@ export default function CsvCollectionPage() {
             isset: "IS_SET",
             isnotset: "IS_NOT_SET",
           };
-  
+
           if (/^[A-Z_]+$/.test(relation)) {
             return relation;
           }
-  
+
           return (
             operatorMap[relation.toLowerCase()] ||
             relation.toUpperCase().replace(/\s+/g, "_")
           );
         };
-  
+
         const rules: CollectionRules[] = [
           {
             column: row.type?.toUpperCase() || "TITLE",
@@ -281,35 +302,36 @@ export default function CsvCollectionPage() {
             condition: String(row.value || "PRODUCT"),
           },
         ];
-                 console.log(selectedPublicationName,"publicatonName")
-    
-         const collectionInput = {
-           title: row.title,
-           handle: row.handle,
-           descriptionHtml: row.description || "Collection created from CSV import",
-           sortOrder: "BEST_SELLING",
-           ruleSet: {
-             appliedDisjunctively: row.match_any === true,
-             rules: rules,
-           },
-           image_src: row.image_src,
-           metafields: [
-             {
-               namespace: "custom",
-               key: "theme_types",
-               value: selectedPublicationName.join("-"), // Use selectedPublicationName array
-               type: "single_line_text_field",
-             },
-           ],
-         };
-  
+        console.log(selectedPublicationName, "publicatonName");
+
+        const collectionInput = {
+          title: row.title,
+          handle: row.handle,
+          descriptionHtml:
+            row.description || "Collection created from CSV import",
+          sortOrder: "BEST_SELLING",
+          ruleSet: {
+            appliedDisjunctively: row.match_any === true,
+            rules: rules,
+          },
+          image_src: row.image_src,
+          metafields: [
+            {
+              namespace: "custom",
+              key: "theme_types",
+              value: selectedPublicationName.join("-"), // Use selectedPublicationName array
+              type: "single_line_text_field",
+            },
+          ],
+        };
+
         console.log(`Collection Input for row ${row.title}:`, collectionInput);
-  
+
         return collectionInput;
       });
-  
+
       console.log("Collections Data to Process:", collectionsData);
-  
+
       // Set initial processing status with total count
       setProcessingStatus((prev) => ({
         ...prev,
@@ -318,26 +340,32 @@ export default function CsvCollectionPage() {
         successful: 0,
         failed: 0,
       }));
-  
+
       // Process each collection creation in sequence
       for (const [index, collectionInput] of collectionsData.entries()) {
         try {
-          console.log(`Processing collection ${index + 1}:`, collectionInput.title);
-  
+          console.log(
+            `Processing collection ${index + 1}:`,
+            collectionInput.title
+          );
+
           // Create collection
           const createResponse = await fetch("/api/create-collection", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ collectionInput, publicationName: selectedPublicationName }),
+            body: JSON.stringify({
+              collectionInput,
+              publicationName: selectedPublicationName,
+            }),
           });
-  
+
           if (!createResponse.ok) {
             const errorData: any = await createResponse.json();
             let errorMessage =
               errorData?.error || "Failed to create collection";
-  
+
             if (errorData?.details && Array.isArray(errorData.details)) {
               const formattedErrors = errorData.details
                 .map((err: { message?: string; field?: string }) => {
@@ -350,9 +378,9 @@ export default function CsvCollectionPage() {
                   return JSON.stringify(err);
                 })
                 .join("\n");
-  
+
               errorMessage = `${errorMessage}\n${formattedErrors}`;
-  
+
               if (errorData?.details[0]?.extensions?.problems) {
                 const problems = errorData.details[0].extensions.problems;
                 const problemPaths = problems
@@ -364,15 +392,18 @@ export default function CsvCollectionPage() {
                 errorMessage += `\n${problemPaths}`;
               }
             }
-  
-            console.error(`Error creating collection ${index + 1}:`, errorMessage);
-  
+
+            console.error(
+              `Error creating collection ${index + 1}:`,
+              errorMessage
+            );
+
             if (errorData?.processedInput) {
               console.log(
                 `Retrying with processed input for collection ${index + 1}:`,
                 errorData.processedInput
               );
-  
+
               const retryResponse = await fetch("/api/create-collection", {
                 method: "POST",
                 headers: {
@@ -382,7 +413,7 @@ export default function CsvCollectionPage() {
                   collectionInput: errorData.processedInput,
                 }),
               });
-  
+
               if (retryResponse.ok) {
                 const retryData: any = await retryResponse.json();
                 if (
@@ -394,18 +425,18 @@ export default function CsvCollectionPage() {
                 }
               }
             }
-  
+
             setApiErrors((prev) => ({
               ...prev,
               createCollection: errorMessage,
             }));
-  
+
             setProcessingStatus((prev) => ({
               ...prev,
               processed: index + 1,
               failed: prev.failed + 1,
             }));
-  
+
             setFailedRecords((prev) => [
               ...prev,
               {
@@ -413,7 +444,7 @@ export default function CsvCollectionPage() {
                 error: errorMessage,
               },
             ]);
-  
+
             throw new Error(errorMessage);
           }
   
@@ -427,19 +458,22 @@ export default function CsvCollectionPage() {
                   `${err.field || "unknown"}: ${err.message}`
               )
               .join(", ");
-            console.error(`Shopify API Error for collection ${index + 1}:`, errorMsg);
-  
+            console.error(
+              `Shopify API Error for collection ${index + 1}:`,
+              errorMsg
+            );
+
             setApiErrors((prev) => ({
               ...prev,
               shopifyErrors: errorMsg,
             }));
-  
+
             setProcessingStatus((prev) => ({
               ...prev,
               processed: index + 1,
               failed: prev.failed + 1,
             }));
-  
+
             setFailedRecords((prev) => [
               ...prev,
               {
@@ -447,27 +481,30 @@ export default function CsvCollectionPage() {
                 error: `Shopify API Error: ${errorMsg}`,
               },
             ]);
-  
+
             throw new Error(`Shopify API Error: ${errorMsg}`);
           }
-  
+
           if (createData?.errors?.length > 0) {
             const errorMsg = createData.errors
               .map((err: GraphQLError) => err.message)
               .join(", ");
-            console.error(`GraphQL Error for collection ${index + 1}:`, errorMsg);
-  
+            console.error(
+              `GraphQL Error for collection ${index + 1}:`,
+              errorMsg
+            );
+
             setApiErrors((prev) => ({
               ...prev,
               graphqlErrors: errorMsg,
             }));
-  
+
             setProcessingStatus((prev) => ({
               ...prev,
               processed: index + 1,
               failed: prev.failed + 1,
             }));
-  
+
             setFailedRecords((prev) => [
               ...prev,
               {
@@ -475,13 +512,13 @@ export default function CsvCollectionPage() {
                 error: `GraphQL Error: ${errorMsg}`,
               },
             ]);
-  
+
             throw new Error(`GraphQL Error: ${errorMsg}`);
           }
-  
+
           const collectionId = createData.data.collectionCreate.collection.id;
           console.log(`Created collection ${index + 1} with ID:`, collectionId);
-  
+
           // Publish collection to selected channels
           const failedPublications: Array<{ id: string; error: string }> = [];
           const publishPromises = selectedPublications.map(async (publicationId) => {
@@ -504,7 +541,7 @@ export default function CsvCollectionPage() {
                 const errorData: any = await response.json();
                 const errorMessage = errorData?.error || "Unknown error";
                 console.error(
-                  `Failed to publish to publication ${publicationId}:`,
+                  `Error publishing to publication ${publicationId}:`,
                   errorMessage
                 );
                 failedPublications.push({
@@ -550,19 +587,23 @@ export default function CsvCollectionPage() {
               });
               return false;
             }
-          });
-  
+          );
+
           const publishResults = await Promise.all(publishPromises);
           const successfulPublications = publishResults.filter(Boolean).length;
-  
+
           setProcessingStatus((prev) => ({
             ...prev,
             total: collectionsData.length,
             processed: index + 1,
-            successful: successfulPublications > 0 ? prev.successful + 1 : prev.successful,
-            failed: successfulPublications === 0 ? prev.failed + 1 : prev.failed,
+            successful:
+              successfulPublications > 0
+                ? prev.successful + 1
+                : prev.successful,
+            failed:
+              successfulPublications === 0 ? prev.failed + 1 : prev.failed,
           }));
-  
+
           if (failedPublications.length > 0) {
             const failedPublicationNames = failedPublications.map((fp) => {
               const pub = publications.find((p) => p.id === fp.id);
@@ -572,12 +613,14 @@ export default function CsvCollectionPage() {
               `Failed to publish collection ${index + 1} to:`,
               failedPublicationNames
             );
-  
+
             setApiErrors((prev) => ({
               ...prev,
-              publishCollection: `Failed to publish to: ${failedPublicationNames.join(", ")}`,
+              publishCollection: `Failed to publish to: ${failedPublicationNames.join(
+                ", "
+              )}`,
             }));
-  
+
             if (successfulPublications > 0) {
               setSuccess(
                 `Processed ${index + 1} of ${
@@ -605,7 +648,7 @@ export default function CsvCollectionPage() {
         } catch (error) {
           console.error(`Error processing collection ${index + 1}:`, error);
           setError((error as Error).message || "Failed to process collection");
-  
+
           setProcessingStatus((prev) => ({
             ...prev,
             processed: index + 1,
@@ -619,7 +662,9 @@ export default function CsvCollectionPage() {
     } finally {
       setProcessingStatus((prevStatus) => {
         if (prevStatus.failed === 0 && prevStatus.successful > 0) {
-          setSuccess(`Processed all ${prevStatus.total} collections successfully!`);
+          setSuccess(
+            `Processed all ${prevStatus.total} collections successfully!`
+          );
         } else {
           setSuccess(
             `Processed ${prevStatus.total} collections: ${prevStatus.successful} successful, ${prevStatus.failed} failed.`
@@ -697,32 +742,28 @@ export default function CsvCollectionPage() {
 
         {publications.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {publications.map(
-              (pub) => (
-                // console.log("Rendering publication:", pub),
-                (
-                  <div
-                    key={pub.id}
-                    className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handlePublicationToggle(pub.id, pub.name)}
-                  >
-                    <input
-                      type="checkbox"
-                      id={pub.id}
-                      checked={selectedPublications.includes(pub.id)}
-                      onChange={() => {}} // Handled by parent div onClick
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <label
-                      htmlFor={pub.id}
-                      className="text-sm cursor-pointer select-none"
-                    >
-                      {pub.name}
-                    </label>
-                  </div>
-                )
-              )
-            )}
+            {publications.map((pub) => (
+              // console.log("Rendering publication:", pub),
+              <div
+                key={pub.id}
+                className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                onClick={() => handlePublicationToggle(pub.id, pub.name)}
+              >
+                <input
+                  type="checkbox"
+                  id={pub.id}
+                  checked={selectedPublications.includes(pub.id)}
+                  onChange={() => {}} // Handled by parent div onClick
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor={pub.id}
+                  className="text-sm cursor-pointer select-none"
+                >
+                  {pub.name}
+                </label>
+              </div>
+            ))}
           </div>
         ) : (
           <p>
