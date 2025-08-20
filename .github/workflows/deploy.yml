@@ -31,6 +31,6 @@ jobs:
             npm install
             npm run build
 
-            pm2 restart nextapp || pm2 start "npm run start" --name hydrogen-store-automation
+            pm2 restart hydrogen-store-automation || pm2 start "npm run start" --name hydrogen-store-automation
             pm2 save
           EOF
