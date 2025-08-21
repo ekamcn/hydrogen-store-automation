@@ -125,7 +125,7 @@ export function StoreSelect({ onSelect, value }: StoreSelectProps) {
 
 export function buildStorePayload(
   source: Partial<StorePayload>
-): { storeData: StoreData; imageData: { base64?: string; url?: string; filename: string;  } } {
+): { storeData: StoreData; imageData: { base64?: string; url?: string; fileName: string;  } } {
   const logoData =
     typeof source.VITE_LOGO === "object" && source.VITE_LOGO?.base64
       ? source.VITE_LOGO.base64
@@ -169,15 +169,15 @@ export function buildStorePayload(
   };
 
   // Always return an object with filename
-  const imageData: { base64?: string; url?: string; filename: string } =
+  const imageData: { base64?: string; url?: string; fileName: string } =
     typeof source.VITE_LOGO === "object" && source.VITE_LOGO?.base64
       ? {
           base64: source.VITE_LOGO.base64,
-          filename: source.VITE_LOGO.fileName ?? "logo.jpg",
+          fileName: source.VITE_LOGO.fileName ?? "logo.jpg",
         }
       : {
           url: typeof source.VITE_LOGO === "string" ? source.VITE_LOGO : DEFAULT_IMAGE_DATA,
-          filename: "logo.jpg",
+          fileName: "logo.jpg",
         };
 
   return {

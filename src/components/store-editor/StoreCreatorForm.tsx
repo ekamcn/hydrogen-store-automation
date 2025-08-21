@@ -50,7 +50,6 @@ const steps = [
 type EnvResponse = {
   success: boolean;
   data?: {
-    storeTitle?: string;
     name?: string;
     email?: string;
     phone?: string;
@@ -158,7 +157,7 @@ export default function StoreEditorForm() {
         const json = (await res.json()) as EnvResponse;
         const d = json?.data || {};
         form.reset({
-          VITE_STORE_TITLE: d.storeTitle || '',
+          VITE_STORE_TITLE: d.name || '',
           VITE_STORE_NAME: storeNameFromQuery,
           VITE_CUSTOMER_SUPPORT_EMAIL: d.email || '',
           VITE_CUSTOMER_SERVICE_PHONE: d.phone || '',
@@ -265,7 +264,6 @@ export default function StoreEditorForm() {
           'VITE_DOMAIN_NAME',
           'VITE_SHOPIFY_ADMIN_ACCESS_TOKEN',
           'VITE_SHOPIFY_URL',
-          // Optional array; not part of required validation
         ];
       case 1:
         return ['VITE_COMPANY_NAME', 'VITE_COMPANY_ADDRESS'];

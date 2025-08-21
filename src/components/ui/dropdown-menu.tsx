@@ -1,10 +1,9 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
 
 // Utility for portal
 const Portal: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (typeof window === "undefined") return null;
-  return createPortal(children, document.body);
+  return React.createPortal(children, document.body);
 };
 
 export const DropdownMenu: React.FC<{ children: React.ReactNode }> = ({ children }) => {
