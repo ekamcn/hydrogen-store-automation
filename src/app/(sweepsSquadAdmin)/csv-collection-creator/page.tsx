@@ -587,6 +587,7 @@ export default function CsvCollectionPage() {
               });
               return false;
             }
+          }
           );
 
           const publishResults = await Promise.all(publishPromises);
