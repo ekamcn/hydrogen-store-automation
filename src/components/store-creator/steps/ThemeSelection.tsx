@@ -37,7 +37,7 @@ export default function ThemeSelection({ form, nextStep, prevStep }: ThemeSelect
                   className="grid grid-cols-2 gap-4"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="DIY" id="DIY" />
+                    <RadioGroupItem value="diy" id="diy" />
                     <Label htmlFor="DIY">DIY</Label>
                   </div>
                   <div className="flex items-center space-x-2">
