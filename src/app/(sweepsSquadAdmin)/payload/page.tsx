@@ -64,8 +64,8 @@ export default function PayloadPage() {
   };
 
   useEffect(() => {
-        // const serverUrl = "http://51.112.151.1";
-    const serverUrl = 'http://51.112.151.1';
+        // const serverUrl = "${process.env.NEXT_PUBLIC_BACKEND_URL}";
+    const serverUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
     socketRef.current = io(serverUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,

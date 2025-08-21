@@ -107,7 +107,7 @@ export default function StoreEditorForm() {
   // Socket.IO setup (mirror socket page approach)
   const socketRef = useRef<Socket | null>(null);
   useEffect(() => {
-    const serverUrl = 'http://51.112.151.1';
+    const serverUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
     socketRef.current = io(serverUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -150,7 +150,7 @@ export default function StoreEditorForm() {
     const fetchAndPopulate = async () => {
       if (!storeNameFromQuery) return;
       try {
-        const res = await fetch(`http://51.112.151.1/store/env?storeName=${encodeURIComponent(storeNameFromQuery)}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/backend/store/env?storeName=${encodeURIComponent(storeNameFromQuery)}`, {
           method: 'GET',
           signal: controller.signal,
         });

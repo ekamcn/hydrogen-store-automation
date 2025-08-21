@@ -85,7 +85,7 @@ export default function GoogleScriptForm() {
     }
     try {
       // Send API request to /store/google-scripts
-      const response = await fetch('http://51.112.151.1/store/google-scripts', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/google-scripts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

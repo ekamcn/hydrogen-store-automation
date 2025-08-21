@@ -43,7 +43,7 @@ export default function CustomersTable() {
   const router = useRouter()
 
   useEffect(() => { 
-    fetch('http://51.112.151.1/store/all')
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/all`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch store data');
@@ -143,7 +143,7 @@ export default function CustomersTable() {
                           <Button
                             onClick={async () => {
                               try {
-                                await fetch(`http://51.112.151.1/store/env?storeName=${encodeURIComponent(customer.storeName)}`, {
+                                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/env?storeName=${encodeURIComponent(customer.storeName)}`, {
                                   method: 'GET',
                                 });
                               } catch {
