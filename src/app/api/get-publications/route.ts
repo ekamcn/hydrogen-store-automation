@@ -20,14 +20,11 @@ export async function GET() {
     `;
 
     // Make the request to Shopify's GraphQL API
-    if (!SHOPIFY_ADMIN_API_URL) {
-      throw new Error('SHOPIFY_ADMIN_API_URL is not defined');
-    }
     const response = await fetch(SHOPIFY_ADMIN_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': SHOPIFY_ADMIN_ACCESS_TOKEN ?? '',
+        'X-Shopify-Access-Token': SHOPIFY_ADMIN_ACCESS_TOKEN,
       },
       body: JSON.stringify({ query }),
     });

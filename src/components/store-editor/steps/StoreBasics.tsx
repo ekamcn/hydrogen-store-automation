@@ -3,7 +3,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { StoreEditorFormData } from '../StoreEditForm';
+import { StoreEditorFormData } from '../StoreCreatorForm';
 
 interface StoreBasicsProps {
   form: UseFormReturn<StoreEditorFormData>;

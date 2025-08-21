@@ -64,7 +64,6 @@ export default function   ReviewSubmit({
     VITE_CHECKOUT_DOMAIN: formData.VITE_CHECKOUT_DOMAIN,
     VITE_CHECKOUT_ID: formData.VITE_CHECKOUT_ID,
     VITE_SQUARE_LOGO: formData.VITE_SQUARE_LOGO,
-    VITE_FOOTER_COLOR: formData.VITE_FOOTER_COLOR,
     VITE_OFFER_ID_TYPE: formData.VITE_OFFER_ID_TYPE,
     customOfferIds: formData.customOfferIds || {},
   }), [
@@ -87,7 +86,6 @@ export default function   ReviewSubmit({
     formData.VITE_CHECKOUT_DOMAIN,
     formData.VITE_CHECKOUT_ID,
     formData.VITE_SQUARE_LOGO,
-    formData.VITE_FOOTER_COLOR,
     formData.VITE_OFFER_ID_TYPE,
     formData.customOfferIds,
   ]);
@@ -324,32 +322,6 @@ export default function   ReviewSubmit({
                 ) : (
                   <p className="mt-1">Not uploaded</p>
                 )}
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Mobile Banner</h4>
-                {formData.VITE_MOBILE_BANNER ? (
-                  <div className="mt-1 flex items-center space-x-2">
-                    <img 
-                      src={typeof formData.VITE_MOBILE_BANNER === 'string' ? formData.VITE_MOBILE_BANNER : formData.VITE_MOBILE_BANNER?.base64} 
-                      alt="Mobile banner preview" 
-                      className="w-10 h-10 object-cover rounded border border-gray-300"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling!.textContent = 'Uploaded ✓';
-                      }}
-                    />
-                    <span className="text-sm text-green-600">Uploaded ✓</span>
-                  </div>
-                ) : (
-                  <p className="mt-1">Not uploaded</p>
-                )}
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Footer ( Phone Number / Email )Color</h4>
-                <div className="mt-1 flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded border border-gray-300" style={{ backgroundColor: formData.VITE_FOOTER_COLOR || '#ffffff' }}></div>
-                  <span>{formData.VITE_FOOTER_COLOR || 'Not specified'}</span>
-                </div>
               </div>
             </div>
           </div>

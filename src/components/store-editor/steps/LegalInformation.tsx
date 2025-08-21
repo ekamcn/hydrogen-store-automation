@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form';
-import { StoreEditorFormData } from '../StoreEditForm';
+import { StoreEditorFormData } from '../StoreCreatorForm';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
