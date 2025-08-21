@@ -1,31 +1,18 @@
-"use client";
-
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Code, CheckCircle } from "lucide-react";
-import { StoreSelect } from "../allCustomers/_components/storeselect";
-import { StorePayload } from "@/utils/storeContext";
-
+'use client';
+ 
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Code, CheckCircle } from 'lucide-react';
+import { StorePayload } from '@/utils/storeContext';
+import { StoreSelect } from '@/components/common/storefront';
+ 
 interface Store {
   store_id: string;
   storeName: string;
@@ -36,56 +23,57 @@ interface Store {
   created_at: string;
   updated_at: string;
 }
-
+ 
 // Define the Zod schema for form validation
 const scriptFormSchema = z.object({
-  headScript: z.string().min(1, "Head script is required"),
-  bodyScript: z.string().min(1, "Body script is required"),
+  headScript: z.string().min(1, 'Head script is required'),
+  bodyScript: z.string().min(1, 'Body script is required'),
 });
-
+ 
 // Define the form data type
 export type ScriptFormData = z.infer<typeof scriptFormSchema>;
-
+ 
 // Initial form data
 const initialFormData: ScriptFormData = {
-  headScript: "",
-  bodyScript: "",
+  headScript: '',
+  bodyScript: '',
 };
-
+ 
 export default function GoogleScriptForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-
+ 
   // Utility to map Store to StorePayload (add more fields as needed)
   function storeToStorePayload(store: Store): StorePayload {
     return {
+      VITE_STORE_TITLE: store.storeName,
       VITE_STORE_NAME: store.storeName,
       VITE_CUSTOMER_SUPPORT_EMAIL: store.email,
       VITE_CUSTOMER_SERVICE_PHONE: store.phone,
-      VITE_DOMAIN_NAME: "",
-      VITE_CATEGORY: "",
-      VITE_LANGUAGE: "",
-      VITE_COLOR1: "",
-      VITE_COLOR2: "",
-      VITE_TYPOGRAPHY: "",
-      VITE_COMPANY_NAME: "",
-      VITE_COMPANY_ADDRESS: "",
-      VITE_CHECKOUT_DOMAIN: "",
-      VITE_CHECKOUT_ID: "",
-      VITE_OFFER_ID_TYPE: "",
+      VITE_DOMAIN_NAME: '',
+      VITE_CATEGORY: '',
+      VITE_LANGUAGE: '',
+      VITE_COLOR1: '',
+      VITE_COLOR2: '',
+      VITE_TYPOGRAPHY: '',
+      VITE_COMPANY_NAME: '',
+      VITE_COMPANY_ADDRESS: '',
+      VITE_CHECKOUT_DOMAIN: '',
+      VITE_CHECKOUT_ID: '',
+      VITE_OFFER_ID_TYPE: '',
       // Add more fields as needed, or map from store if available
     };
   }
-
+ 
   // Initialize React Hook Form
   const form = useForm<ScriptFormData>({
     resolver: zodResolver(scriptFormSchema),
     defaultValues: initialFormData,
-    mode: "onChange",
+    mode: 'onChange',
   });
-
+ 
   // Handle form submission
   const handleSubmit = async (data: ScriptFormData) => {
     setIsSubmitting(true);
@@ -97,7 +85,7 @@ export default function GoogleScriptForm() {
     }
     try {
       // Send API request to /store/google-scripts
-      const response = await fetch("http://51.112.151.1/store/google-scripts", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/google-scripts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,15 +98,8 @@ export default function GoogleScriptForm() {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        if (
-          typeof errorData === "object" &&
-          errorData !== null &&
-          "message" in errorData
-        ) {
-          throw new Error(
-            (errorData as { message?: string }).message ||
-              "Failed to save scripts"
-          );
+        if (typeof errorData === 'object' && errorData !== null && 'message' in errorData) {
+          throw new Error((errorData as { message?: string }).message || "Failed to save scripts");
         } else {
           throw new Error("Failed to save scripts");
         }
@@ -126,16 +107,13 @@ export default function GoogleScriptForm() {
       // Set success state
       setSubmitSuccess(true);
     } catch (error) {
-      console.error("Error submitting scripts:", error);
-      setSubmitError(
-        (error as Error).message ||
-          "There was an error saving your scripts. Please try again."
-      );
+      console.error('Error submitting scripts:', error);
+      setSubmitError((error as Error).message || 'There was an error saving your scripts. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
-
+ 
   // Reset the form
   const resetForm = () => {
     form.reset(initialFormData);
@@ -143,7 +121,7 @@ export default function GoogleScriptForm() {
     setSubmitError(null);
     setSubmitSuccess(false);
   };
-
+ 
   if (submitSuccess) {
     return (
       <div className="max-w-4xl mx-auto bg-white dark:bg-background rounded-lg shadow-md p-6">
@@ -156,8 +134,7 @@ export default function GoogleScriptForm() {
               IDs Saved Successfully!
             </CardTitle>
             <CardDescription>
-              Your Google Ads ID and Synchronis ID have been saved and are ready
-              to use.
+              Your Google Ads ID and Synchronis ID have been saved and are ready to use.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
@@ -169,7 +146,7 @@ export default function GoogleScriptForm() {
       </div>
     );
   }
-
+ 
   return (
     <div className="max-w-4xl mx-auto bg-white dark:bg-background rounded-lg shadow-md p-6">
       {/* Store Select Box */}
@@ -181,22 +158,17 @@ export default function GoogleScriptForm() {
               <Code className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold">
-                Google Ads & Synchronis ID Form
-              </CardTitle>
-              <CardDescription>
-                Add your Google Ads ID and Synchronis ID for your store
-              </CardDescription>
+                          <CardTitle className="text-2xl font-bold">Google Ads & Synchronis ID Form</CardTitle>
+            <CardDescription>
+              Add your Google Ads ID and Synchronis ID for your store
+            </CardDescription>
             </div>
           </div>
         </CardHeader>
-
+ 
         <CardContent>
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-6"
-            >
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               {/* Google Ads ID Field */}
               <FormField
                 control={form.control}
@@ -220,7 +192,7 @@ export default function GoogleScriptForm() {
                   </FormItem>
                 )}
               />
-
+ 
               {/* Synchronis ID Field */}
               <FormField
                 control={form.control}
@@ -244,14 +216,14 @@ export default function GoogleScriptForm() {
                   </FormItem>
                 )}
               />
-
+ 
               {/* Error Alert */}
               {submitError && (
                 <Alert variant="destructive">
                   <AlertDescription>{submitError}</AlertDescription>
                 </Alert>
               )}
-
+ 
               {/* Submit Button */}
               <div className="flex justify-end space-x-4">
                 <Button
@@ -259,7 +231,7 @@ export default function GoogleScriptForm() {
                   variant="outline"
                   onClick={resetForm}
                   disabled={isSubmitting}
-                  className="text-black"
+                  className='text-black'
                 >
                   Reset Form
                 </Button>
@@ -274,7 +246,7 @@ export default function GoogleScriptForm() {
                       Saving...
                     </>
                   ) : (
-                    "Save IDs"
+                    'Save IDs'
                   )}
                 </Button>
               </div>
@@ -285,3 +257,4 @@ export default function GoogleScriptForm() {
     </div>
   );
 }
+ 
