@@ -15,7 +15,7 @@ import StepIndicator from './StepIndicator';
 
 // Define the Zod schema for form validation
 const storeFormSchema = z.object({
-  // Store Basics
+  // Store Basics helper
   VITE_STORE_TITLE: z.string().min(1, 'Store title is required'),
   VITE_STORE_NAME: z.string().min(1, 'Store name is required'),
   VITE_CUSTOMER_SUPPORT_EMAIL: z.string().email('Please enter a valid customer support email address'),
