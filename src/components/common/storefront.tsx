@@ -168,7 +168,7 @@ export function buildStorePayload(
       : undefined,
   };
 
-  // Always return an object with filename
+  // Always return an object with filenames
   const imageData: { base64?: string; url?: string; fileName: string } =
     typeof source.VITE_LOGO === "object" && source.VITE_LOGO?.base64
       ? {
