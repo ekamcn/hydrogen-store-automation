@@ -76,7 +76,7 @@ export function StoreSelect({ onSelect, value }: StoreSelectProps) {
           } else {
             setStores([]);
           }
-          setLoading(false);
+          setLoading(false)
         })
         .catch((err: unknown) => {
           setError(err instanceof Error ? err.message : 'Unknown error');
