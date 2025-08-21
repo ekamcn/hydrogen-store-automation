@@ -10,7 +10,7 @@ import ErrorMessage from "@/components/ui/ErrorMessage";
 import { parseCsvToJson } from "@/utils/parseCSV";
 import { exportToCSV } from "@/utils/exportToCSV";
 import { CloudCog } from "lucide-react";
-import { StoreSelect } from "@/components/common/storefront";
+// import { StoreSelect } from "@/components/common/storefront";
 
 interface Store {
   store_id: string;
@@ -681,7 +681,7 @@ export default function CsvCollectionPage() {
     <div className="max-w-2xl mx-auto p-6 ">
       <h1 className="text-3xl font-bold mb-6">Create Collection from CSV</h1>
       {/* Store Select Box */}
-      <StoreSelect onSelect={setSelectedStore} />
+      {/* <StoreSelect onSelect={setSelectedStore} /> */}
 
       {error && <ErrorMessage message={error} className="mb-4" />}
       {success && <SuccessMessage message={success} className="mb-4" />}

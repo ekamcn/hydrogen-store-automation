@@ -32,7 +32,7 @@ export function StoreSelect({ onSelect, value }: StoreSelectProps) {
   const [selectedId, setSelectedId] = useState<string>(value || "");
 
   useEffect(() => {
-    fetch("http://51.112.151.1/store/all")
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/all`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch store data");
