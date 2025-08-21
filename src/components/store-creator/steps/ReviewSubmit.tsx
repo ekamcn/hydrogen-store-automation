@@ -66,6 +66,7 @@ export default function   ReviewSubmit({
     VITE_CHECKOUT_DOMAIN: formData.VITE_CHECKOUT_DOMAIN,
     VITE_CHECKOUT_ID: formData.VITE_CHECKOUT_ID,
     VITE_SQUARE_LOGO: formData.VITE_SQUARE_LOGO,
+    VITE_FOOTER_COLOR: formData.VITE_FOOTER_COLOR,
     VITE_OFFER_ID_TYPE: formData.VITE_OFFER_ID_TYPE,
     customOfferIds: formData.customOfferIds || {},
     VITE_DISCOVER_OUR_COLLECTIONS: formData.VITE_DISCOVER_OUR_COLLECTIONS || [],
@@ -91,6 +92,7 @@ export default function   ReviewSubmit({
     formData.VITE_CHECKOUT_DOMAIN,
     formData.VITE_CHECKOUT_ID,
     formData.VITE_SQUARE_LOGO,
+    formData.VITE_FOOTER_COLOR,
     formData.VITE_OFFER_ID_TYPE,
     formData.customOfferIds,
     formData.VITE_DISCOVER_OUR_COLLECTIONS,
@@ -365,6 +367,13 @@ export default function   ReviewSubmit({
                 ) : (
                   <p className="mt-1">Not uploaded</p>
                 )}
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Footer ( Phone Number / Email )Color</h4>
+                <div className="mt-1 flex items-center space-x-2">
+                  <div className="w-6 h-6 rounded border border-gray-300" style={{ backgroundColor: formData.VITE_FOOTER_COLOR || '#ffffff' }}></div>
+                  <span>{formData.VITE_FOOTER_COLOR || 'Not specified'}</span>
+                </div>
               </div>
             </div>
           </div>

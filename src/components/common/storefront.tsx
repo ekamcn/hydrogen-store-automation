@@ -19,6 +19,7 @@ interface StoreData {
   phone: string;
   logoName: string;
   logoType: string;
+  footerColor?: string;
   logoData?: string | { base64: string; fileName: string };
   imageData?: string | { base64: string; fileName: string };
   // Additional fields from context payload
@@ -124,7 +125,7 @@ export function StoreSelect({ onSelect, value }: StoreSelectProps) {
 
 export function buildStorePayload(
   source: Partial<StorePayload>
-): { storeData: StoreData; imageData: { base64?: string; url?: string; filename: string } } {
+): { storeData: StoreData; imageData: { base64?: string; url?: string; filename: string;  } } {
   const logoData =
     typeof source.VITE_LOGO === "object" && source.VITE_LOGO?.base64
       ? source.VITE_LOGO.base64
@@ -139,6 +140,10 @@ export function buildStorePayload(
     logoName: "logo.jpg",
     logoType: "image/jpeg",
     imageData: logoData || DEFAULT_IMAGE_DATA, // keep string for compatibility
+        footerColor:
+    typeof source.VITE_FOOTER_COLOR === "string"
+      ? source.VITE_FOOTER_COLOR
+      : undefined,
     storeTitle: source.VITE_STORE_TITLE,
     domainName: source.VITE_DOMAIN_NAME,
     shopifyEmail: source.VITE_SHOPIFY_EMAIL,

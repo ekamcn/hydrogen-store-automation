@@ -32,6 +32,7 @@ const storeFormSchema = z.object({
 
   // Brand Customization
   VITE_COLOR1: z.string().min(1, 'Primary color is required'),
+  VITE_FOOTER_COLOR: z.string().min(1, "Email color is required"),
   VITE_COLOR2: z.string().min(1, 'Secondary color is required'),
   VITE_LOGO: z.object({
     base64: z.string(),
@@ -85,6 +86,7 @@ const initialFormData: Partial<StoreFormData> = {
   // Brand Customization
   VITE_COLOR1: '#000000',
   VITE_COLOR2: '#ffffff',
+  VITE_FOOTER_COLOR: "#ffffff",
   VITE_LOGO: undefined,
   VITE_BANNER: undefined,
   VITE_MOBILE_BANNER: undefined,
@@ -252,7 +254,7 @@ export default function StoreCreatorForm() {
     switch (step) {
       case 0: return ['VITE_STORE_NAME', 'VITE_CUSTOMER_SUPPORT_EMAIL', 'VITE_CUSTOMER_SERVICE_PHONE', 'VITE_DOMAIN_NAME', 'VITE_SHOPIFY_ADMIN_ACCESS_TOKEN', 'VITE_SHOPIFY_URL'];
       case 1: return ['VITE_CATEGORY', 'VITE_LANGUAGE'];
-      case 2: return ['VITE_COLOR1', 'VITE_COLOR2', 'VITE_LOGO', 'VITE_BANNER', 'VITE_TYPOGRAPHY'];
+      case 2: return ['VITE_COLOR1', 'VITE_COLOR2', "VITE_FOOTER_COLOR", 'VITE_LOGO', 'VITE_BANNER', 'VITE_TYPOGRAPHY'];
       case 3: return ['VITE_COMPANY_NAME', 'VITE_COMPANY_ADDRESS'];
       case 4: return ['VITE_CHECKOUT_DOMAIN', 'VITE_CHECKOUT_ID', 'VITE_SQUARE_LOGO', 'VITE_OFFER_ID_TYPE', 'customOfferIds'];
       default: return [];
