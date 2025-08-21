@@ -150,7 +150,7 @@ export default function StoreEditorForm() {
     const fetchAndPopulate = async () => {
       if (!storeNameFromQuery) return;
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/backend/store/env?storeName=${encodeURIComponent(storeNameFromQuery)}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/env?storeName=${encodeURIComponent(storeNameFromQuery)}`, {
           method: 'GET',
           signal: controller.signal,
         });
