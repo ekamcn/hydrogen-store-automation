@@ -98,8 +98,12 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
                     if (file) {
                       try {
                         const base64String = await fileToBase64(file);
-                        field.onChange(base64String);
-                        console.log('Logo converted to base64:', base64String.substring(0, 50) + '...');
+                        const logoData = {
+                          base64: base64String,
+                          fileName: file.name
+                        };
+                        field.onChange(logoData);
+                        console.log('Logo converted to base64:', base64String.substring(0, 50) + '...', 'Logo:', file.name);
                       } catch (error) {
                         console.error('Error converting logo to base64:', error);
                         field.onChange('');
@@ -131,8 +135,12 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
                     if (file) {
                       try {
                         const base64String = await fileToBase64(file);
-                        field.onChange(base64String);
-                        console.log('Banner converted to base64:', base64String.substring(0, 50) + '...');
+                        const bannerData = {
+                          base64: base64String,
+                          fileName: file.name
+                        };
+                        field.onChange(bannerData);
+                        console.log('Banner converted to base64:', base64String.substring(0, 50) + '...', 'Banner:', file.name);
                       } catch (error) {
                         console.error('Error converting banner to base64:', error);
                         field.onChange('');
@@ -142,6 +150,43 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
                     }
                   }}
                   className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="VITE_MOBILE_BANNER"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mobile Banner</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const base64String = await fileToBase64(file);
+                        const bannerData = {
+                          base64: base64String,
+                          fileName: file.name
+                        };
+                        field.onChange(bannerData);
+                        console.log('Mobile banner converted to base64:', base64String.substring(0, 50) + '...', 'Banner:', file.name);
+                      } catch (error) {
+                        console.error('Error converting mobile banner to base64:', error);
+                        field.onChange('');
+                      }
+                    } else {
+                      field.onChange('');
+                    }
+                  }}
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
                 />
               </FormControl>
               <FormMessage />
@@ -173,10 +218,10 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
         />
 
         <div className="flex justify-between">
-          <Button type="button" variant="outline" onClick={prevStep}>
+          <Button type="button" variant="outline" onClick={prevStep} className='text-black'>
             Previous
           </Button>
-          <Button type="button" onClick={nextStep}>
+          <Button type="button" onClick={nextStep} className='bg-black'>
             Next
           </Button>
         </div>

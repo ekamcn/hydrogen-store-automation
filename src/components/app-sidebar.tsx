@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar,  Inbox, Search, Users ,ScrollText , LogOutIcon, Moon, Sun } from "lucide-react"
+import { Calendar,  Inbox, Search, Users ,ScrollText, FileText, LogOutIcon, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 
@@ -19,6 +19,9 @@ import {
 const items = [
   { title: "Customers", url: "/allCustomers", icon: Users  },
   { title: "Create Store", url: "/store-creator", icon: ScrollText   },
+  { title: "CSV Collection Creator", url: "/csv-collection-creator", icon: FileText },
+  { title: "Google Script Form", url: "/google-script-form", icon: Calendar },
+  { title: "CSV Product Creator", url: "/product-uploader", icon: FileText },
 
 ]
 

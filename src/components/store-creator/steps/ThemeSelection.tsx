@@ -97,10 +97,10 @@ export default function ThemeSelection({ form, nextStep, prevStep }: ThemeSelect
         />
 
         <div className="flex justify-between">
-          <Button type="button" variant="outline" onClick={prevStep}>
+          <Button type="button" variant="outline" onClick={prevStep} className='text-black'>
             Previous
           </Button>
-          <Button type="button" onClick={nextStep}>
+          <Button type="button" onClick={nextStep} className='bg-black'>
             Next
           </Button>
         </div>

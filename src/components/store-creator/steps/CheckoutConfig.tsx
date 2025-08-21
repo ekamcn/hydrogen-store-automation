@@ -75,8 +75,12 @@ export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutCon
                     if (file) {
                       try {
                         const base64String = await fileToBase64(file);
-                        field.onChange(base64String);
-                        console.log('Square logo converted to base64:', base64String.substring(0, 50) + '...');
+                        const squareLogoData = {
+                          base64: base64String,
+                          fileName: file.name
+                        };
+                        field.onChange(squareLogoData);
+                        console.log('Square logo converted to base64:', base64String.substring(0, 50) + '...', 'Square Logo:', file.name);
                       } catch (error) {
                         console.error('Error converting square logo to base64:', error);
                         field.onChange('');
@@ -124,14 +128,27 @@ export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutCon
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Custom Offer IDs</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.keys(form.getValues('customOfferIds') || {}).map((pricePoint) => (
+            {[
+              { key: '9_99', label: '9.99' },
+              { key: '19_5', label: '19.5' },
+              { key: '29_9', label: '29.9' },
+              { key: '39_99', label: '39.99' },
+              { key: '49_9', label: '49.9' },
+              { key: '59_5', label: '59.5' },
+              { key: '69_99', label: '69.99' },
+              { key: '79_9', label: '79.9' },
+              { key: '89_5', label: '89.5' },
+              { key: '99_99', label: '99.99' },
+              { key: '109_9', label: '109.9' },
+              { key: '119_5', label: '119.5' },
+            ].map(({ key, label }) => (
               <FormField
-                key={pricePoint}
+                key={key}
                 control={form.control}
-                name={`customOfferIds.${pricePoint}` as any}
+                name={`customOfferIds.${key}` as any}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>${pricePoint}</FormLabel>
+                    <FormLabel>${label}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter offer ID"
@@ -147,15 +164,15 @@ export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutCon
         </div>
       )}
 
-        <div className="flex justify-between">
-          <Button type="button" variant="outline" onClick={prevStep}>
-            Previous
-          </Button>
-          <Button type="button" onClick={nextStep}>
-            Next
-          </Button>
-        </div>
-     
+      <div className="flex justify-between">
+        <Button type="button" variant="outline" onClick={prevStep} className='text-black'>
+          Previous
+        </Button>
+        <Button type="button" onClick={nextStep} className='bg-black'>
+          Next
+        </Button>
+      </div>
+
     </div>
   );
 }

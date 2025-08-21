@@ -18,10 +18,10 @@ type ReviewSubmitProps = {
   nextStep: () => void;
 };
 
-export default function ReviewSubmit({ 
+export default function   ReviewSubmit({ 
   form, 
   prevStep, 
-  //handleSubmit, 
+  handleSubmit, 
   isSubmitting, 
   submitError,
   submitSuccess,
@@ -30,7 +30,7 @@ export default function ReviewSubmit({
  // nextStep, 
 }: ReviewSubmitProps) {
   const { setPayload } = useStoreContext();
-  
+   
   // State to track streaming updates
   const [streamingUpdates, setStreamingUpdates] = useState<{
     message: string;
@@ -45,17 +45,21 @@ export default function ReviewSubmit({
   
   // Create memoized payload to prevent unnecessary updates
   const payload = useMemo(() => ({
+    VITE_STORE_TITLE: formData.VITE_STORE_TITLE,
     VITE_STORE_NAME: formData.VITE_STORE_NAME,
     VITE_CUSTOMER_SUPPORT_EMAIL: formData.VITE_CUSTOMER_SUPPORT_EMAIL,
     VITE_CUSTOMER_SERVICE_PHONE: formData.VITE_CUSTOMER_SERVICE_PHONE,
     VITE_DOMAIN_NAME: formData.VITE_DOMAIN_NAME,
     VITE_SHOPIFY_EMAIL: formData.VITE_SHOPIFY_EMAIL,
+    VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: formData.VITE_SHOPIFY_ADMIN_ACCESS_TOKEN,
+    VITE_SHOPIFY_URL: formData.VITE_SHOPIFY_URL,
     VITE_CATEGORY: formData.VITE_CATEGORY,
     VITE_LANGUAGE: formData.VITE_LANGUAGE,
     VITE_COLOR1: formData.VITE_COLOR1,
     VITE_COLOR2: formData.VITE_COLOR2,
     VITE_LOGO: formData.VITE_LOGO,
     VITE_BANNER: formData.VITE_BANNER,
+    VITE_MOBILE_BANNER: formData.VITE_MOBILE_BANNER,
     VITE_TYPOGRAPHY: formData.VITE_TYPOGRAPHY,
     VITE_COMPANY_NAME: formData.VITE_COMPANY_NAME,
     VITE_COMPANY_ADDRESS: formData.VITE_COMPANY_ADDRESS,
@@ -63,18 +67,24 @@ export default function ReviewSubmit({
     VITE_CHECKOUT_ID: formData.VITE_CHECKOUT_ID,
     VITE_SQUARE_LOGO: formData.VITE_SQUARE_LOGO,
     VITE_OFFER_ID_TYPE: formData.VITE_OFFER_ID_TYPE,
+    customOfferIds: formData.customOfferIds || {},
+    VITE_DISCOVER_OUR_COLLECTIONS: formData.VITE_DISCOVER_OUR_COLLECTIONS || [],
   }), [
+    formData.VITE_STORE_TITLE,
     formData.VITE_STORE_NAME,
     formData.VITE_CUSTOMER_SUPPORT_EMAIL,
     formData.VITE_CUSTOMER_SERVICE_PHONE,
     formData.VITE_DOMAIN_NAME,
     formData.VITE_SHOPIFY_EMAIL,
+    formData.VITE_SHOPIFY_ADMIN_ACCESS_TOKEN,
+    formData.VITE_SHOPIFY_URL,
     formData.VITE_CATEGORY,
     formData.VITE_LANGUAGE,
     formData.VITE_COLOR1,
     formData.VITE_COLOR2,
     formData.VITE_LOGO,
     formData.VITE_BANNER,
+    formData.VITE_MOBILE_BANNER,
     formData.VITE_TYPOGRAPHY,
     formData.VITE_COMPANY_NAME,
     formData.VITE_COMPANY_ADDRESS,
@@ -82,6 +92,8 @@ export default function ReviewSubmit({
     formData.VITE_CHECKOUT_ID,
     formData.VITE_SQUARE_LOGO,
     formData.VITE_OFFER_ID_TYPE,
+    formData.customOfferIds,
+    formData.VITE_DISCOVER_OUR_COLLECTIONS,
   ]);
   
   // Use useEffect to set payload when it changes
@@ -198,6 +210,10 @@ export default function ReviewSubmit({
           <div className="p-4 space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Store Title</h4>
+                <p className="mt-1">{formData.VITE_STORE_TITLE || 'Not specified'}</p>
+              </div>
+              <div>
                 <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Store Name</h4>
                 <p className="mt-1">{formData.VITE_STORE_NAME || 'Not specified'}</p>
               </div>
@@ -216,6 +232,28 @@ export default function ReviewSubmit({
               <div>
                 <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Shopify Email</h4>
                 <p className="mt-1">{formData.VITE_SHOPIFY_EMAIL || 'Not specified'}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Shopify Store URL</h4>
+                <p className="mt-1">{formData.VITE_SHOPIFY_URL || 'Not specified'}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Shopify Admin Access Token</h4>
+                <p className="mt-1">{formData.VITE_SHOPIFY_ADMIN_ACCESS_TOKEN}</p>
+              </div>
+              <div className="md:col-span-2">
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Discover Our Collections</h4>
+                {Array.isArray(formData.VITE_DISCOVER_OUR_COLLECTIONS) && formData.VITE_DISCOVER_OUR_COLLECTIONS.length > 0 ? (
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {formData.VITE_DISCOVER_OUR_COLLECTIONS.map((c, idx) => (
+                      <span key={idx} className="inline-block px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800">
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-1">Not specified</p>
+                )}
               </div>
             </div>
           </div>
@@ -276,7 +314,7 @@ export default function ReviewSubmit({
                 {formData.VITE_LOGO ? (
                   <div className="mt-1 flex items-center space-x-2">
                     <img 
-                      src={formData.VITE_LOGO} 
+                      src={typeof formData.VITE_LOGO === 'string' ? formData.VITE_LOGO : formData.VITE_LOGO?.base64}
                       alt="Logo preview" 
                       className="w-8 h-8 object-cover rounded border border-gray-300"
                       onError={(e) => {
@@ -295,9 +333,28 @@ export default function ReviewSubmit({
                 {formData.VITE_BANNER ? (
                   <div className="mt-1 flex items-center space-x-2">
                     <img 
-                      src={formData.VITE_BANNER} 
+                      src={typeof formData.VITE_BANNER === 'string' ? formData.VITE_BANNER : formData.VITE_BANNER?.base64} 
                       alt="Banner preview" 
                       className="w-12 h-6 object-cover rounded border border-gray-300"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling!.textContent = 'Uploaded ✓';
+                      }}
+                    />
+                    <span className="text-sm text-green-600">Uploaded ✓</span>
+                  </div>
+                ) : (
+                  <p className="mt-1">Not uploaded</p>
+                )}
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Mobile Banner</h4>
+                {formData.VITE_MOBILE_BANNER ? (
+                  <div className="mt-1 flex items-center space-x-2">
+                    <img 
+                      src={typeof formData.VITE_MOBILE_BANNER === 'string' ? formData.VITE_MOBILE_BANNER : formData.VITE_MOBILE_BANNER?.base64} 
+                      alt="Mobile banner preview" 
+                      className="w-10 h-10 object-cover rounded border border-gray-300"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                         e.currentTarget.nextElementSibling!.textContent = 'Uploaded ✓';
@@ -352,7 +409,7 @@ export default function ReviewSubmit({
                 {formData.VITE_SQUARE_LOGO ? (
                   <div className="mt-1 flex items-center space-x-2">
                     <img 
-                      src={formData.VITE_SQUARE_LOGO} 
+                      src={typeof formData.VITE_SQUARE_LOGO === 'string' ? formData.VITE_SQUARE_LOGO : formData.VITE_SQUARE_LOGO?.base64}
                       alt="Square logo preview" 
                       className="w-8 h-8 object-cover rounded border border-gray-300"
                       onError={(e) => {
@@ -400,14 +457,16 @@ export default function ReviewSubmit({
           type="button"
           variant="outline"
           onClick={prevStep}
+          className='text-black'
           disabled={isSubmitting || streamingUpdates !== null}
         >
           Previous
         </Button>
-        <Link href='/payload'>
+        <Link href="/socket">
         <Button
           type="button"
-         // onClick={handleStreamingUpdates}
+          className='bg-black'
+         onClick={() => handleSubmit(formData)}
        //  onClick={() => {console.log("formData", formData);}}
           disabled={isSubmitting || streamingUpdates !== null}
         >

@@ -16,46 +16,50 @@ import StepIndicator from './StepIndicator';
 // Define the Zod schema for form validation
 const storeFormSchema = z.object({
   // Store Basics
+  VITE_STORE_TITLE: z.string().min(1, 'Store title is required'),
   VITE_STORE_NAME: z.string().min(1, 'Store name is required'),
   VITE_CUSTOMER_SUPPORT_EMAIL: z.string().email('Please enter a valid customer support email address'),
   VITE_CUSTOMER_SERVICE_PHONE: z.string().min(1, 'Please enter a valid customer service phone number'),
   VITE_DOMAIN_NAME: z.string().min(1, 'Domain name is required'),
   VITE_SHOPIFY_EMAIL: z.string().email('Please enter a valid Shopify email address').optional(),
-  
+  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: z.string().min(1, 'Shopify Admin Access Token is required'),
+  VITE_SHOPIFY_URL: z.string().min(1, 'Shopify Store URL is required'),
+  VITE_DISCOVER_OUR_COLLECTIONS: z.array(z.string().min(1)).optional(),
+
   // Theme Selection
-  VITE_CATEGORY: z.enum(['DIY', 'pets', 'deco', 'baby', 'automoto', 'general']),
+  VITE_CATEGORY: z.enum(['diy', 'pets', 'deco', 'baby', 'automoto', 'general']),
   VITE_LANGUAGE: z.enum(['en', 'fr']),
-  
+
   // Brand Customization
   VITE_COLOR1: z.string().min(1, 'Primary color is required'),
   VITE_COLOR2: z.string().min(1, 'Secondary color is required'),
-  VITE_LOGO: z.string().optional(),
-  VITE_BANNER: z.string().optional(),
+  VITE_LOGO: z.object({
+    base64: z.string(),
+    fileName: z.string()
+  }).optional(),
+  VITE_BANNER: z.object({
+    base64: z.string(),
+    fileName: z.string()
+  }).optional(),
+  VITE_MOBILE_BANNER: z.object({
+    base64: z.string(),
+    fileName: z.string()
+  }).optional(),
   VITE_TYPOGRAPHY: z.enum(['sans-serif', 'serif', 'monospace']),
-  
+
   // Legal Information
   VITE_COMPANY_NAME: z.string().min(1, 'Company name is required'),
   VITE_COMPANY_ADDRESS: z.string().min(1, 'Company address is required'),
-  
+
   // Checkout Configuration
   VITE_CHECKOUT_DOMAIN: z.string().min(1, 'Checkout domain is required'),
   VITE_CHECKOUT_ID: z.string().min(1, 'Checkout ID is required'),
-  VITE_SQUARE_LOGO: z.string().optional(),
-  VITE_OFFER_ID_TYPE: z.enum(['default', 'custom']),
-  customOfferIds: z.object({
-    '9.99': z.string().optional(),
-    '19.5': z.string().optional(),
-    '29.9': z.string().optional(),
-    '39.99': z.string().optional(),
-    '49.9': z.string().optional(),
-    '59.5': z.string().optional(),
-    '69.99': z.string().optional(),
-    '79.9': z.string().optional(),
-    '89.5': z.string().optional(),
-    '99.99': z.string().optional(),
-    '109.9': z.string().optional(),
-    '119.5': z.string().optional(),
+  VITE_SQUARE_LOGO: z.object({
+    base64: z.string(),
+    fileName: z.string()
   }).optional(),
+  VITE_OFFER_ID_TYPE: z.enum(['default', 'custom']),
+  customOfferIds: z.record(z.string(), z.string().optional()).optional(),
 });
 
 // Define the form data type
@@ -64,45 +68,50 @@ export type StoreFormData = z.infer<typeof storeFormSchema>;
 // Initial form data
 const initialFormData: Partial<StoreFormData> = {
   // Store Basics
+  VITE_STORE_TITLE: '',
   VITE_STORE_NAME: '',
   VITE_CUSTOMER_SUPPORT_EMAIL: '',
   VITE_CUSTOMER_SERVICE_PHONE: '',
   VITE_DOMAIN_NAME: '',
   VITE_SHOPIFY_EMAIL: '',
-  
+  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: '',
+  VITE_SHOPIFY_URL: '',
+  VITE_DISCOVER_OUR_COLLECTIONS: [],
+
   // Theme Selection
   VITE_CATEGORY: 'general' as const,
   VITE_LANGUAGE: 'en' as const,
-  
+
   // Brand Customization
   VITE_COLOR1: '#000000',
   VITE_COLOR2: '#ffffff',
-  VITE_LOGO: '',
-  VITE_BANNER: '',
+  VITE_LOGO: undefined,
+  VITE_BANNER: undefined,
+  VITE_MOBILE_BANNER: undefined,
   VITE_TYPOGRAPHY: 'sans-serif' as const,
-  
+
   // Legal Information
   VITE_COMPANY_NAME: '',
   VITE_COMPANY_ADDRESS: '',
-  
+
   // Checkout Configuration
   VITE_CHECKOUT_DOMAIN: '',
   VITE_CHECKOUT_ID: '',
-  VITE_SQUARE_LOGO: '',
+  VITE_SQUARE_LOGO: undefined,
   VITE_OFFER_ID_TYPE: 'default' as const,
   customOfferIds: {
-    '9.99': '',
-    '19.5': '',
-    '29.9': '',
-    '39.99': '',
-    '49.9': '',
-    '59.5': '',
-    '69.99': '',
-    '79.9': '',
-    '89.5': '',
-    '99.99': '',
-    '109.9': '',
-    '119.5': '',
+    '9_99': '',
+    '19_5': '',
+    '29_9': '',
+    '39_99': '',
+    '49_9': '',
+    '59_5': '',
+    '69_99': '',
+    '79_9': '',
+    '89_5': '',
+    '99_99': '',
+    '109_9': '',
+    '119_5': '',
   },
 };
 
@@ -140,28 +149,30 @@ export default function StoreCreatorForm() {
       updateValidationStatus();
     });
     return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch]);
 
   // Initial validation check
   useEffect(() => {
     updateValidationStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Navigate to next step with validation
   const nextStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep);
     const isValid = await trigger(fieldsToValidate);
-    
+
     // Mark current step as completed
     const newCompletionStatus = [...stepCompletionStatus];
     newCompletionStatus[currentStep] = true;
     setStepCompletionStatus(newCompletionStatus);
-    
+
     if (isValid && currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     }
-    
+
     // Update validation status
     setTimeout(() => updateValidationStatus(), 100);
   };
@@ -178,33 +189,34 @@ export default function StoreCreatorForm() {
   const checkStepValidation = async (stepIndex: number): Promise<boolean> => {
     const fieldsToValidate = getFieldsForStep(stepIndex);
     if (fieldsToValidate.length === 0) return true;
-    
+
     const values = getValues();
     const errors = formState.errors;
-    
+
     // Check if all required fields for this step have values and no errors
     for (const field of fieldsToValidate) {
       const value = values[field];
       const hasError = errors[field];
-      
+
       // For required fields, check if they have values
       if (field === 'VITE_STORE_NAME' || field === 'VITE_CUSTOMER_SUPPORT_EMAIL' || field === 'VITE_CUSTOMER_SERVICE_PHONE' ||
-          field === 'VITE_DOMAIN_NAME' || field === 'VITE_CATEGORY' || field === 'VITE_LANGUAGE' ||
-          field === 'VITE_COLOR1' || field === 'VITE_COLOR2' || field === 'VITE_TYPOGRAPHY' ||
-          field === 'VITE_COMPANY_NAME' || field === 'VITE_COMPANY_ADDRESS' || 
-          field === 'VITE_CHECKOUT_DOMAIN' || field === 'VITE_CHECKOUT_ID' || field === 'VITE_OFFER_ID_TYPE') {
+        field === 'VITE_DOMAIN_NAME' || field === 'VITE_SHOPIFY_ADMIN_ACCESS_TOKEN' || field === 'VITE_SHOPIFY_URL' ||
+        field === 'VITE_CATEGORY' || field === 'VITE_LANGUAGE' ||
+        field === 'VITE_COLOR1' || field === 'VITE_COLOR2' || field === 'VITE_TYPOGRAPHY' ||
+        field === 'VITE_COMPANY_NAME' || field === 'VITE_COMPANY_ADDRESS' ||
+        field === 'VITE_CHECKOUT_DOMAIN' || field === 'VITE_CHECKOUT_ID' || field === 'VITE_OFFER_ID_TYPE') {
         if (!value || hasError) {
           return false;
         }
       }
-      
+
       // For optional fields, they are always valid
-      if (field === 'VITE_SHOPIFY_EMAIL' || field === 'VITE_LOGO' || field === 'VITE_BANNER' || 
-          field === 'VITE_SQUARE_LOGO' || field === 'customOfferIds') {
+      if (field === 'VITE_SHOPIFY_EMAIL' || field === 'VITE_LOGO' || field === 'VITE_BANNER' ||
+        field === 'VITE_SQUARE_LOGO' || field === 'customOfferIds') {
         continue;
       }
     }
-    
+
     return true;
   };
 
@@ -226,10 +238,10 @@ export default function StoreCreatorForm() {
         newCompletionStatus[currentStep] = true;
         setStepCompletionStatus(newCompletionStatus);
       }
-      
+
       setCurrentStep(stepIndex);
       window.scrollTo(0, 0);
-      
+
       // Update validation status
       setTimeout(() => updateValidationStatus(), 100);
     }
@@ -238,7 +250,7 @@ export default function StoreCreatorForm() {
   // Get fields to validate for each step
   const getFieldsForStep = (step: number): (keyof StoreFormData)[] => {
     switch (step) {
-      case 0: return ['VITE_STORE_NAME', 'VITE_CUSTOMER_SUPPORT_EMAIL', 'VITE_CUSTOMER_SERVICE_PHONE', 'VITE_DOMAIN_NAME', 'VITE_SHOPIFY_EMAIL'];
+      case 0: return ['VITE_STORE_NAME', 'VITE_CUSTOMER_SUPPORT_EMAIL', 'VITE_CUSTOMER_SERVICE_PHONE', 'VITE_DOMAIN_NAME', 'VITE_SHOPIFY_ADMIN_ACCESS_TOKEN', 'VITE_SHOPIFY_URL'];
       case 1: return ['VITE_CATEGORY', 'VITE_LANGUAGE'];
       case 2: return ['VITE_COLOR1', 'VITE_COLOR2', 'VITE_LOGO', 'VITE_BANNER', 'VITE_TYPOGRAPHY'];
       case 3: return ['VITE_COMPANY_NAME', 'VITE_COMPANY_ADDRESS'];
@@ -251,11 +263,11 @@ export default function StoreCreatorForm() {
   const handleSubmit = async (data: StoreFormData) => {
     setIsSubmitting(true);
     setSubmitError(null);
-    
+
     try {
       // Call the API to create the store
       console.log("responseData :", data);
-      
+
       // Set success state
       setSubmitSuccess(true);
     } catch (error) {
@@ -293,11 +305,11 @@ export default function StoreCreatorForm() {
         return <CheckoutConfig form={form} nextStep={nextStep} prevStep={prevStep} />;
       case 5:
         return (
-          <ReviewSubmit 
+          <ReviewSubmit
             form={form}
-            prevStep={prevStep} 
+            prevStep={prevStep}
             handleSubmit={handleSubmit}
-            isSubmitting={isSubmitting} 
+            isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}
             storeUrl={storeUrl}
@@ -313,9 +325,9 @@ export default function StoreCreatorForm() {
   return (
     <Form {...form}>
       <div className="max-w-4xl mx-auto bg-white dark:bg-background rounded-lg shadow-md p-6">
-        <StepIndicator 
-          steps={steps} 
-          currentStep={currentStep} 
+        <StepIndicator
+          steps={steps}
+          currentStep={currentStep}
           goToStep={goToStep}
           stepValidationStatus={stepValidationStatus}
           stepCompletionStatus={stepCompletionStatus}

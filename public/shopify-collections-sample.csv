@@ -1,0 +1,12 @@
+title,description,handle,collection_type,match_any,image_url,image_alt,type,operator,value
+Smart Collection 1,Includes discounted products,discounted-products,smart,TRUE,https://example.com/images/discount.jpg,Discount Image,category,IS_SET,toy
+Smart Collection 2,All products with category ID,cat-id-collection,smart,FALSE,https://example.com/images/category.jpg,Category Image,compare_at_price,GREATER_THAN,2
+Smart Collection 3,Category with descendants,cat-descendants,smart,FALSE,https://example.com/images/descendants.jpg,Descendants Image,weight,LESS_THAN,10
+Smart Collection 4,Filtered by tag,tagged-products,smart,TRUE,https://example.com/images/tagged.jpg,Tagged Image,TAG,CONTAINS,holiday
+Smart Collection 5,Filtered by title,title-filter,smart,FALSE,https://example.com/images/title.jpg,Title Image,TITLE,STARTS_WITH,Summer
+Smart Collection 6,Filtered by product type,type-filter,smart,FALSE,https://example.com/images/type.jpg,Type Image,TYPE,EQUALS,T-Shirts
+Smart Collection 7,High price products,expensive-products,smart,TRUE,https://example.com/images/price.jpg,Price Image,VARIANT_PRICE,GREATER_THAN,100
+Smart Collection 8,Compare at price check,compare-at-check,smart,FALSE,https://example.com/images/compare.jpg,Compare Image,VARIANT_COMPARE_AT_PRICE,IS_NOT_SET,
+Smart Collection 9,Stock level check,stock-check,smart,FALSE,https://example.com/images/inventory.jpg,Stock Image,VARIANT_INVENTORY,LESS_THAN,5
+Smart Collection 10,By vendor name,vendor-check,smart,FALSE,https://example.com/images/vendor.jpg,Vendor Image,VENDOR,EQUALS,Nike
+Manual Collection,Manually managed collection,manual-collection,manual,FALSE,,,,,
