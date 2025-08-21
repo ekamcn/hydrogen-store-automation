@@ -81,7 +81,35 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
               </FormItem>
             )}
           />
+                    {/* Footer Color */}
+          <FormField
+            control={form.control}
+            name="VITE_FOOTER_COLOR"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Footer ( Phone Number / Email )Color *</FormLabel>
+                <FormControl>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="color"
+                      {...field}
+                      className="w-16 h-10 p-1 border rounded"
+                    />
+                    <Input
+                      type="text"
+                      {...field}
+                      placeholder="#ffffff"
+                      className="flex-1"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+ 
         </div>
+
 
         <FormField
           control={form.control}
