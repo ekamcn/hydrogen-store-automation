@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     }
     // Replace spaces with hyphens in metafield values
     if (collectionInput?.metafields && collectionInput.metafields.length > 0) {
-      collectionInput.metafields.forEach((metafield: { value: string; }) => {
+      collectionInput.metafields.forEach(metafield => {
         if (metafield.value && typeof metafield.value === 'string') {
           metafield.value = metafield.value.replace(/\s+/g, '-');
         }

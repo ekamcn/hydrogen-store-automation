@@ -32,20 +32,12 @@ export async function POST(request: NextRequest) {
       }
     `;
 
-    // Check if SHOPIFY_ADMIN_API_URL is defined
-    if (!SHOPIFY_ADMIN_API_URL) {
-      return NextResponse.json(
-        { error: 'SHOPIFY_ADMIN_API_URL environment variable is not set.' },
-        { status: 500 }
-      );
-    }
-
     // Make the request to Shopify's GraphQL API
     const response = await fetch(SHOPIFY_ADMIN_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': SHOPIFY_ADMIN_ACCESS_TOKEN ?? '',
+        'X-Shopify-Access-Token': SHOPIFY_ADMIN_ACCESS_TOKEN,
       },
       body: JSON.stringify({
         query: mutation,

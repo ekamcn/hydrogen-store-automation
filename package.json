@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001 -H localhost --turbopack",
+    "dev": "next dev -p 4000 -H localhost --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4000 -H 0.0.0.0",
     "lint": "next lint"
   },
   "dependencies": {
@@ -19,7 +19,6 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@shopify/cli": "^3.81.2",
-    "@shopify/storefront-api-client": "^1.0.9",
     "@tanstack/react-table": "^8.21.3",
     "@types/papaparse": "^5.3.16",
     "axios": "^1.10.0",

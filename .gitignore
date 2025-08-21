@@ -24,4 +24,6 @@ dist-ssr
 *.sw?
 .next/
 .marscode/
+/hydrogen-storefront
+/group-hydrogen-theme
 .env

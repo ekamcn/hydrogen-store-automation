@@ -7,15 +7,13 @@ export async function POST(request: NextRequest) {
   try {
     const { parsedCsvData, publications } = await request.json()
 
-    async function uploadProducts(parsedCsvData: any[], publications: {
-      publicationId: any; publicationName: string; 
-}[]) {
-      let groupedMedia: { handle: any; media: any[]; }[] = [];
-      let currentHandle: string | null = null;
-      let currentMediaGroup: { originalSource: any; alt: any; contentType: string; }[] = [];
+    async function uploadProducts(parsedCsvData, publications) {
+      let groupedMedia = [];
+      let currentHandle = null;
+      let currentMediaGroup = [];
 
       // 🧩 Group media by Handle
-      parsedCsvData.forEach((row: { [x: string]: string; }, index: number) => {
+      parsedCsvData.forEach((row, index) => {
         const handle = row["Handle"];
         const url = row["Image Src"];
         const altText = row["Image Alt Text"] || "Media for " + handle;
@@ -141,13 +139,11 @@ export async function POST(request: NextRequest) {
                   sku: product['Variant SKU']?.toString()
                 },
               ],
-              // Add media property, will be set below if matchedMediaGroup exists
-              media: [] as { originalSource: string; alt: string; contentType: string }[],
             },
           };
 
           if (matchedMediaGroup) {
-            inputPayload.productSet.media = matchedMediaGroup.media;
+            inputPayload.productSet.files = matchedMediaGroup.media;
           }
 
           // 🛠️ Create product

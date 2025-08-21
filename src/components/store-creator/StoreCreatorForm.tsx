@@ -16,7 +16,6 @@ import StepIndicator from './StepIndicator';
 // Define the Zod schema for form validation
 const storeFormSchema = z.object({
   // Store Basics
-  VITE_STORE_TITLE: z.string().min(1, 'Store title is required'),
   VITE_STORE_NAME: z.string().min(1, 'Store name is required'),
   VITE_CUSTOMER_SUPPORT_EMAIL: z.string().email('Please enter a valid customer support email address'),
   VITE_CUSTOMER_SERVICE_PHONE: z.string().min(1, 'Please enter a valid customer service phone number'),
@@ -24,7 +23,6 @@ const storeFormSchema = z.object({
   VITE_SHOPIFY_EMAIL: z.string().email('Please enter a valid Shopify email address').optional(),
   VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: z.string().min(1, 'Shopify Admin Access Token is required'),
   VITE_SHOPIFY_URL: z.string().min(1, 'Shopify Store URL is required'),
-  VITE_DISCOVER_OUR_COLLECTIONS: z.array(z.string().min(1)).optional(),
 
   // Theme Selection
   VITE_CATEGORY: z.enum(['diy', 'pets', 'deco', 'baby', 'automoto', 'general']),
@@ -38,10 +36,6 @@ const storeFormSchema = z.object({
     fileName: z.string()
   }).optional(),
   VITE_BANNER: z.object({
-    base64: z.string(),
-    fileName: z.string()
-  }).optional(),
-  VITE_MOBILE_BANNER: z.object({
     base64: z.string(),
     fileName: z.string()
   }).optional(),
@@ -68,7 +62,6 @@ export type StoreFormData = z.infer<typeof storeFormSchema>;
 // Initial form data
 const initialFormData: Partial<StoreFormData> = {
   // Store Basics
-  VITE_STORE_TITLE: '',
   VITE_STORE_NAME: '',
   VITE_CUSTOMER_SUPPORT_EMAIL: '',
   VITE_CUSTOMER_SERVICE_PHONE: '',
@@ -76,7 +69,6 @@ const initialFormData: Partial<StoreFormData> = {
   VITE_SHOPIFY_EMAIL: '',
   VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: '',
   VITE_SHOPIFY_URL: '',
-  VITE_DISCOVER_OUR_COLLECTIONS: [],
 
   // Theme Selection
   VITE_CATEGORY: 'general' as const,
@@ -87,7 +79,6 @@ const initialFormData: Partial<StoreFormData> = {
   VITE_COLOR2: '#ffffff',
   VITE_LOGO: undefined,
   VITE_BANNER: undefined,
-  VITE_MOBILE_BANNER: undefined,
   VITE_TYPOGRAPHY: 'sans-serif' as const,
 
   // Legal Information
