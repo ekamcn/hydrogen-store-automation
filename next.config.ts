@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  assetPrefix: "/frontend",
+  
   eslint: {
     ignoreDuringBuilds: true, // 👈 disables ESLint errors on build
   },
