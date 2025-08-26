@@ -20,6 +20,22 @@ interface StorePayload {
   VITE_SQUARE_LOGO?: string;
   VITE_OFFER_ID_TYPE?: string;
   customOfferIds?: Record<string, string>;
+  VITE_COMPANY_BUSINESS_NUMBER?: string;
+  VITE_POLICY_UPDATED_AT?: string;
+  VITE_TERMS_OF_SERVICE_UPDATE_AT?: string;
+  VITE_BUSINESS_HOURS?: string;
+  VITE_REFUND_PERIOD?: string;
+  VITE_REFUND_PROCESSING_TIME?: string;
+  VITE_DELIVERY_PROVIDER?: string;
+  VITE_ORDER_PROCESSING_TIME?: string;
+  VITE_STANDARD_DELIVERY_TIME?: string;
+  VITE_RETURN_PERIOD?: string;
+  VITE_DELIVERY_AREAS?: string;
+  VITE_SUPPORT_HOURS?: string;
+  VITE_WITHDRAWAL_PERIOD?: string;
+  VITE_RETURN_SHIPPING_POLICY?: string;
+  VITE_SALE_ITEMS_POLICY?: string;
+  VITE_COM;
 }
 
 interface StoreData {
@@ -47,6 +63,22 @@ interface StoreData {
   squareLogo?: string;
   offerIdType?: string;
   customOfferIds?: Record<string, string>;
+  companyBusinessNumber?: string;
+  policyUpdatedAt?: string;
+  termsOfServiceUpdateAt?: string;
+  businessHours?: string;
+  refundPeriod?: string;
+  refundProcessingTime?: string;
+  deliveryProvider?: string;
+  orderProcessingTime?: string;
+  standardDeliveryTime?: string;
+  returnPeriod?: string;
+  deliveryAreas?: string;
+  supportHours?: string;
+  withdrawalPeriod?: string;
+  returnShippingPolicy?: string;
+  saleItemsPolicy?: string;
+  discoverOurCollections?: string;
 }
 
 export const DEFAULT_IMAGE_DATA =
@@ -82,5 +114,20 @@ export function buildStorePayload(
     squareLogo: source.VITE_SQUARE_LOGO,
     offerIdType: source.VITE_OFFER_ID_TYPE,
     customOfferIds: source.customOfferIds,
+    companyBusinessNumber: source.VITE_COMPANY_BUSINESS_NUMBER,
+    policyUpdatedAt: source.VITE_POLICY_UPDATED_AT,
+    termsOfServiceUpdateAt: source.VITE_TERMS_OF_SERVICE_UPDATE_AT,
+    businessHours: source.VITE_BUSINESS_HOURS,
+    refundPeriod: source.VITE_REFUND_PERIOD,
+    refundProcessingTime: source.VITE_REFUND_PROCESSING_TIME,
+    deliveryProvider: source.VITE_DELIVERY_PROVIDER,
+    orderProcessingTime: source.VITE_ORDER_PROCESSING_TIME,
+    standardDeliveryTime: source.VITE_STANDARD_DELIVERY_TIME,
+    returnPeriod: source.VITE_RETURN_PERIOD,
+    deliveryAreas: source.VITE_DELIVERY_AREAS,
+    supportHours: source.VITE_SUPPORT_HOURS,
+    withdrawalPeriod: source.VITE_WITHDRAWAL_PERIOD,
+    returnShippingPolicy: source.VITE_RETURN_SHIPPING_POLICY,
+    saleItemsPolicy: source.VITE_SALE_ITEMS_POLICY,
   };
 }
