@@ -71,7 +71,8 @@ const storeFormSchema = z.object({
     .min(1, "Company business registration number / SIREN is required"),
   // Policy Information
   VITE_POLICY_UPDATED_AT: z.string().min(1, "Policy updated at is required"),
-
+  VITE_TERMS_OF_SERVICE_UPDATE_AT: z.string().min(1, "Terms of service update date is required"),
+  // Privacy Policy
   VITE_BUSINESS_HOURS: z.string().min(1, "Business hours are required"),
   VITE_REFUND_PERIOD: z.string().min(1, "Refund period is required"),
   VITE_REFUND_PROCESSING_TIME: z
@@ -142,6 +143,7 @@ const initialFormData: Partial<StoreFormData> = {
   VITE_COMPANY_ADDRESS: "",
   VITE_COMPANY_BUSINESS_NUMBER: "",
   VITE_POLICY_UPDATED_AT: "",
+  VITE_TERMS_OF_SERVICE_UPDATE_AT: "",
   VITE_BUSINESS_HOURS: "",
   VITE_REFUND_PERIOD: "",
   VITE_REFUND_PROCESSING_TIME: "",
@@ -287,6 +289,7 @@ export default function StoreCreatorForm() {
         "VITE_COMPANY_NAME",
         "VITE_COMPANY_ADDRESS",
         "VITE_POLICY_UPDATED_AT",
+        "VITE_TERMS_OF_SERVICE_UPDATE_AT",
         "VITE_BUSINESS_HOURS",
         "VITE_REFUND_PERIOD",
         "VITE_REFUND_PROCESSING_TIME",
@@ -383,6 +386,7 @@ export default function StoreCreatorForm() {
           "VITE_COMPANY_ADDRESS",
           "VITE_COMPANY_BUSINESS_NUMBER",
           "VITE_POLICY_UPDATED_AT",
+          "VITE_TERMS_OF_SERVICE_UPDATE_AT",
           "VITE_BUSINESS_HOURS",
           "VITE_REFUND_PERIOD",
           "VITE_REFUND_PROCESSING_TIME",
