@@ -113,6 +113,25 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
             </FormItem>
           )}
         />
+  <FormField
+          control={form.control}
+          name="VITE_SHOPIFY_EMAIL"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Shopify Email</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="admin@yourstore.myshopify.com"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+<div className='pt-2.5'>
 
 
         <FormField
@@ -129,13 +148,14 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
                 />
               </FormControl>
               <FormMessage />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 pt-2">
                 Enter only the store name from your Shopify admin URL. For example, if your URL is <code>https://admin.shopify.com/store/hxzfsw-2e/products</code>, enter <strong>hxzfsw-2e</strong> in the input box.
               </p>
 
             </FormItem>
           )}
         />
+        </div>
 
         <FormField
           control={form.control}
@@ -157,23 +177,7 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
             </FormItem>
           )}
         />
-         <FormField
-          control={form.control}
-          name="VITE_SHOPIFY_EMAIL"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Shopify Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="admin@yourstore.myshopify.com"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+       
       </div>
 
       <div className="flex justify-end">
