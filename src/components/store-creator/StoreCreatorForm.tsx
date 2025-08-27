@@ -280,6 +280,7 @@ export default function StoreCreatorForm() {
         "VITE_CUSTOMER_SERVICE_PHONE",
         "VITE_DOMAIN_NAME",
         "VITE_SHOPIFY_ADMIN_ACCESS_TOKEN",
+        "VITE_COMPANY_BUSINESS_NUMBER",
         "VITE_SHOPIFY_URL",
         "VITE_CATEGORY",
         "VITE_LANGUAGE",
