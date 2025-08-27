@@ -176,9 +176,11 @@ export default function StoreEditorForm() {
   // Socket.IO setup (mirror socket page approach)
   const socketRef = useRef<Socket | null>(null);
   useEffect(() => {
-    const serverUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
+    const serverUrl = `http://51.112.151.1`;
     socketRef.current = io(serverUrl, {
       transports: ["websocket", "polling"],
+      path: "/backend/socket.io",
+      forceNew: true,
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1500,

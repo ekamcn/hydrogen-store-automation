@@ -105,8 +105,28 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
             </FormItem>
           )}
         />
+ <FormField
+          control={form.control}
+          name="VITE_SHOPIFY_EMAIL"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Shopify Email</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="admin@yourstore.myshopify.com"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
 
+        <div className='pt-2.5'>
+
+        
         <FormField
           control={form.control}
           name="VITE_SHOPIFY_URL"
@@ -128,6 +148,7 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
             </FormItem>
           )}
         />
+</div>
 
         <FormField
           control={form.control}
@@ -149,23 +170,7 @@ export default function StoreBasics({ form, nextStep }: StoreBasicsProps) {
             </FormItem>
           )}
         />
-         <FormField
-          control={form.control}
-          name="VITE_SHOPIFY_EMAIL"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Shopify Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="admin@yourstore.myshopify.com"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        
         
         <FormField
           control={form.control}

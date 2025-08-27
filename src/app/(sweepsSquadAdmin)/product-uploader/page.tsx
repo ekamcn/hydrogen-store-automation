@@ -9,7 +9,7 @@ import SuccessMessage from "@/components/ui/SuccessMessage";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { parseCsvToJson } from "@/utils/parseCSV";
 import { exportToCSV } from "@/utils/exportToCSV";
-import { StoreSelect } from "@/components/common/storefront";
+// import { StoreSelect } from "@/components/common/storefront";
 
 interface Store {
   store_id: string;
@@ -284,7 +284,7 @@ export default function CsvCollectionPage() {
     <div className="max-w-2xl mx-auto p-6 ">
       <h1 className="text-3xl font-bold mb-6">Create Products from CSV</h1>
       {/* Store Select Box */}
-      <StoreSelect onSelect={setSelectedStore} />
+      {/* <StoreSelect onSelect={setSelectedStore} /> */}
 
       {/* <Card className="p-4 mb-6 bg-blue-50">
         <h3 className="text-lg font-semibold text-blue-800 mb-2">

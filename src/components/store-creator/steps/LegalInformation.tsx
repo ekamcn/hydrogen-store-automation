@@ -122,7 +122,28 @@ export default function LegalInformation({
             )}
           />
         </div>
-
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="VITE_TERMS_OF_SERVICE_UPDATE_AT"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Terms of Service Updated At{" "}
+                  <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Date of last policy update"
+                    {...field}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <section id="shipping-policy">
           <div className="mb-4">
             <p className="text-sm mb-2 font-semibold">Shipping Policy</p>

@@ -32,6 +32,21 @@ export type StorePayload = {
     | Record<string, string | undefined>
     | { base64: string; fileName: string }
     | undefined;
+  companyBusinessNumber?: string;
+  policyUpdatedAt?: string;
+  businessHours?: string;
+  refundPeriod?: string;
+  refundProcessingTime?: string;
+  deliveryProvider?: string;
+  orderProcessingTime?: string;
+  standardDeliveryTime?: string;
+  returnPeriod?: string;
+  deliveryAreas?: string;
+  supportHours?: string;
+  withdrawalPeriod?: string;
+  returnShippingPolicy?: string;
+  saleItemsPolicy?: string;
+  termsOfServiceUpdateAt?: string;
 };
 
 type StoreContextType = {

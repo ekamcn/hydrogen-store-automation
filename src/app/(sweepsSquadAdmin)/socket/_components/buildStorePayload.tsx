@@ -22,6 +22,7 @@ interface StorePayload {
   customOfferIds?: Record<string, string>;
   VITE_COMPANY_BUSINESS_NUMBER?: string;
   VITE_POLICY_UPDATED_AT?: string;
+  VITE_TERMS_OF_SERVICE_UPDATE_AT?: string;
   VITE_BUSINESS_HOURS?: string;
   VITE_REFUND_PERIOD?: string;
   VITE_REFUND_PROCESSING_TIME?: string;
@@ -64,6 +65,7 @@ interface StoreData {
   customOfferIds?: Record<string, string>;
   companyBusinessNumber?: string;
   policyUpdatedAt?: string;
+  termsOfServiceUpdateAt?: string;
   businessHours?: string;
   refundPeriod?: string;
   refundProcessingTime?: string;
@@ -114,6 +116,7 @@ export function buildStorePayload(
     customOfferIds: source.customOfferIds,
     companyBusinessNumber: source.VITE_COMPANY_BUSINESS_NUMBER,
     policyUpdatedAt: source.VITE_POLICY_UPDATED_AT,
+    termsOfServiceUpdateAt: source.VITE_TERMS_OF_SERVICE_UPDATE_AT,
     businessHours: source.VITE_BUSINESS_HOURS,
     refundPeriod: source.VITE_REFUND_PERIOD,
     refundProcessingTime: source.VITE_REFUND_PROCESSING_TIME,
