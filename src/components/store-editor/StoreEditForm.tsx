@@ -33,10 +33,10 @@ const storeEditorFormSchema = z.object({
   VITE_SHOPIFY_URL: z.string().min(1, "Shopify Store URL is required"),
   VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
   VITE_COMPANY_ADDRESS: z.string().min(1, "Company address is required"),
-  VITE_COMPANY_BUSINESS_NUMBER: z
+  VITE_SIREN_NUMBER: z
     .string()
     .min(1, "Company business registration number / SIREN is required"),
-  VITE_POLICY_UPDATED_AT: z.string().min(1, "Policy updated at is required"),
+  VITE_PP_LAST_UPDATED_DATE: z.string().min(1, "Policy updated at is required"),
   VITE_BUSINESS_HOURS: z.string().min(1, "Business hours are required"),
   VITE_REFUND_PERIOD: z.string().min(1, "Refund period is required"),
   VITE_REFUND_PROCESSING_TIME: z
@@ -57,10 +57,10 @@ const storeEditorFormSchema = z.object({
     .string()
     .min(1, "Return shipping policy is required"),
   VITE_SALE_ITEMS_POLICY: z.string().min(1, "Sale items policy is required"),
+  VITE_TC_LAST_UPDATED_DATE: z.string().min(1, "T&C updated at is required"),
 });
 
 export type StoreEditorFormData = z.infer<typeof storeEditorFormSchema>;
-
 const initialFormData: Partial<StoreEditorFormData> = {
   VITE_STORE_TITLE: "",
   VITE_STORE_NAME: "",
@@ -72,8 +72,8 @@ const initialFormData: Partial<StoreEditorFormData> = {
   VITE_SHOPIFY_URL: "",
   VITE_COMPANY_NAME: "",
   VITE_COMPANY_ADDRESS: "",
-  VITE_COMPANY_BUSINESS_NUMBER: "",
-  VITE_POLICY_UPDATED_AT: "",
+  VITE_SIREN_NUMBER: "",
+  VITE_PP_LAST_UPDATED_DATE: "",
   VITE_BUSINESS_HOURS: "",
   VITE_REFUND_PERIOD: "",
   VITE_REFUND_PROCESSING_TIME: "",
@@ -86,6 +86,7 @@ const initialFormData: Partial<StoreEditorFormData> = {
   VITE_WITHDRAWAL_PERIOD: "",
   VITE_RETURN_SHIPPING_POLICY: "",
   VITE_SALE_ITEMS_POLICY: "",
+  VITE_TC_LAST_UPDATED_DATE: "",
 };
 
 const steps = [
@@ -121,6 +122,7 @@ type EnvResponse = {
     withdrawalPeriod?: string;
     returnShippingPolicy?: string;
     saleItemsPolicy?: string;
+    termsOfServiceUpdateAt?: string;
   };
 };
 
@@ -128,6 +130,7 @@ type EnvResponse = {
 function buildUpdatePayload(values: StoreEditorFormData) {
   return {
     name: values.VITE_STORE_NAME,
+    storeTitle: values.VITE_STORE_TITLE,
     email: values.VITE_CUSTOMER_SUPPORT_EMAIL,
     phone: values.VITE_CUSTOMER_SERVICE_PHONE,
     domainName: values.VITE_DOMAIN_NAME,
@@ -136,8 +139,25 @@ function buildUpdatePayload(values: StoreEditorFormData) {
     shopifyAdminToken: values.VITE_SHOPIFY_ADMIN_ACCESS_TOKEN,
     companyName: values.VITE_COMPANY_NAME,
     companyAddress: values.VITE_COMPANY_ADDRESS,
+    companyBusinessNumber: values.VITE_SIREN_NUMBER,
+    policyUpdatedAt: values.VITE_PP_LAST_UPDATED_DATE,
+    businessHours: values.VITE_BUSINESS_HOURS,
+    refundPeriod: values.VITE_REFUND_PERIOD,
+    refundProcessingTime: values.VITE_REFUND_PROCESSING_TIME,
+    deliveryProvider: values.VITE_DELIVERY_PROVIDER,
+    deliveryAreas: values.VITE_DELIVERY_AREAS,
+    orderProcessingTime: values.VITE_ORDER_PROCESSING_TIME,
+    standardDeliveryTime: values.VITE_STANDARD_DELIVERY_TIME,
+    returnPeriod: values.VITE_RETURN_PERIOD,
+    supportHours: values.VITE_SUPPORT_HOURS,
+    withdrawalPeriod: values.VITE_WITHDRAWAL_PERIOD,
+    returnShippingPolicy: values.VITE_RETURN_SHIPPING_POLICY,
+    saleItemsPolicy: values.VITE_SALE_ITEMS_POLICY,
+    termsOfServiceUpdateAt: values.VITE_TC_LAST_UPDATED_DATE,
   };
-}
+
+  };
+
 
 // Persist the latest form values to the server
 async function saveStoreEnv(
@@ -247,8 +267,9 @@ export default function StoreEditorForm() {
           VITE_SHOPIFY_URL: d.shopifyUrl || "",
           VITE_COMPANY_NAME: d.companyName || "",
           VITE_COMPANY_ADDRESS: d.companyAddress || "",
-          VITE_COMPANY_BUSINESS_NUMBER: d.companyBusinessNumber || "",
-          VITE_POLICY_UPDATED_AT: d.policyUpdatedAt || "",
+          VITE_SIREN_NUMBER: d.companyBusinessNumber || "",
+          VITE_PP_LAST_UPDATED_DATE: d.policyUpdatedAt || "",
+          VITE_TC_LAST_UPDATED_DATE: d.termsOfServiceUpdateAt || "",
           VITE_BUSINESS_HOURS: d.businessHours || "",
           VITE_REFUND_PERIOD: d.refundPeriod || "",
           VITE_REFUND_PROCESSING_TIME: d.refundProcessingTime || "",
@@ -364,8 +385,9 @@ export default function StoreEditorForm() {
         return [
           "VITE_COMPANY_NAME",
           "VITE_COMPANY_ADDRESS",
-          "VITE_COMPANY_BUSINESS_NUMBER",
-          "VITE_POLICY_UPDATED_AT",
+          "VITE_SIREN_NUMBER",
+          "VITE_PP_LAST_UPDATED_DATE",
+          "VITE_TC_LAST_UPDATED_DATE",
           "VITE_BUSINESS_HOURS",
           "VITE_REFUND_PERIOD",
           "VITE_REFUND_PROCESSING_TIME",

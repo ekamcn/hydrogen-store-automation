@@ -58,7 +58,7 @@ export default function LegalInformation({
             />
             <FormField
               control={form.control}
-              name="VITE_COMPANY_BUSINESS_NUMBER"
+              name="VITE_SIREN_NUMBER"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>
@@ -105,11 +105,32 @@ export default function LegalInformation({
         <div className="space-y-6">
           <FormField
             control={form.control}
-            name="VITE_POLICY_UPDATED_AT"
+            name="VITE_PP_LAST_UPDATED_DATE"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
                   Policy Updated At <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Date of last policy update"
+                    {...field}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="VITE_TC_LAST_UPDATED_DATE"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Terms Updated At <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
