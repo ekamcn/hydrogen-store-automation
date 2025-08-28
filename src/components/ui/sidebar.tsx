@@ -144,7 +144,9 @@ function SidebarProvider({
           )}
           {...props}
         >
+          <React.Suspense>
           {children}
+          </React.Suspense>
         </div>
       </TooltipProvider>
     </SidebarContext.Provider>
