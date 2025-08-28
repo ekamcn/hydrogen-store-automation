@@ -10,9 +10,9 @@ import LegalInformation from "./steps/LegalInformation";
 import StepIndicator from "./StepIndicator";
 import { useSearchParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
-import { Button } from "@/components/ui/button";
+import { useStoreContext } from "@/utils/storeContext";
 
-// Define the Zod schema for form validation (only relevant fields)
+// Define the Zod schema for form validation
 const storeEditorFormSchema = z.object({
   VITE_STORE_TITLE: z.string().min(1, "Store title is required"),
   VITE_STORE_NAME: z.string().min(1, "Store name is required"),
@@ -155,9 +155,7 @@ function buildUpdatePayload(values: StoreEditorFormData) {
     saleItemsPolicy: values.VITE_SALE_ITEMS_POLICY,
     termsOfServiceUpdateAt: values.VITE_TC_LAST_UPDATED_DATE,
   };
-
-  };
-
+}
 
 // Persist the latest form values to the server
 async function saveStoreEnv(
@@ -170,6 +168,7 @@ async function saveStoreEnv(
 }
 
 export default function StoreEditorForm() {
+  const { setPayload } = useStoreContext(); // Access context to update payload
   const [currentStep, setCurrentStep] = useState(0);
   const [stepCompletionStatus, setStepCompletionStatus] = useState<boolean[]>([
     false,
@@ -179,7 +178,6 @@ export default function StoreEditorForm() {
     false,
     false,
   ]);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const searchParams = useSearchParams();
   const storeNameFromQuery = searchParams.get("storeName") || "";
@@ -193,7 +191,7 @@ export default function StoreEditorForm() {
 
   const { trigger, getValues, formState, watch } = form;
 
-  // Socket.IO setup (mirror socket page approach)
+  // Socket.IO setup
   const socketRef = useRef<Socket | null>(null);
   useEffect(() => {
     const serverUrl = `http://51.112.151.1`;
@@ -208,14 +206,13 @@ export default function StoreEditorForm() {
     const socket = socketRef.current;
 
     socket.on("connect", () => {
-      // connected
+      console.log("Socket.IO connected");
     });
 
     socket.on("disconnect", () => {
-      // disconnected
+      console.log("Socket.IO disconnected");
     });
 
-    // Shopify auth flow handlers
     socket.on("shopify:authurl", (data: unknown) => {
       if (typeof data === "string" && data.startsWith("http")) {
         window.alert(
@@ -226,8 +223,7 @@ export default function StoreEditorForm() {
     });
 
     socket.on("shopify:authcode", (data: { authCode?: string } | unknown) => {
-      // Optional: indicate auth started
-      // console.log('Auth code received:', (data as { authCode?: string })?.authCode);
+      console.log("Auth code received:", (data as { authCode?: string })?.authCode);
     });
 
     return () => {
@@ -255,8 +251,7 @@ export default function StoreEditorForm() {
         if (!res.ok) return;
         const json = (await res.json()) as EnvResponse;
         const d = json?.data || {};
-        console.log("TEST", d);
-        form.reset({
+        const formData = {
           VITE_STORE_TITLE: d.storeTitle || "",
           VITE_STORE_NAME: storeNameFromQuery,
           VITE_CUSTOMER_SUPPORT_EMAIL: d.email || "",
@@ -282,27 +277,26 @@ export default function StoreEditorForm() {
           VITE_WITHDRAWAL_PERIOD: d.withdrawalPeriod || "",
           VITE_RETURN_SHIPPING_POLICY: d.returnShippingPolicy || "",
           VITE_SALE_ITEMS_POLICY: d.saleItemsPolicy || "",
-        });
+        };
+        form.reset(formData);
+        setPayload(formData); // Update context with fetched data
       } catch {
-        // ignore fetch errors for prefill
+        console.log("Fetch error for prefill ignored");
       }
     };
     fetchAndPopulate();
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeNameFromQuery]);
+  }, [storeNameFromQuery, form, setPayload]);
 
   useEffect(() => {
     const subscription = watch(() => {
       updateValidationStatus();
     });
     return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch]);
 
   useEffect(() => {
     updateValidationStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const emitShopifyUpdate = (values: StoreEditorFormData) => {
@@ -379,7 +373,6 @@ export default function StoreEditorForm() {
           "VITE_DOMAIN_NAME",
           "VITE_SHOPIFY_ADMIN_ACCESS_TOKEN",
           "VITE_SHOPIFY_URL",
-          // Optional array; not part of required validation
         ];
       case 1:
         return [
@@ -408,18 +401,16 @@ export default function StoreEditorForm() {
 
   const handleSubmit = async (data: StoreEditorFormData) => {
     try {
-      // Emit final update before submit
       emitShopifyUpdate(data);
-      // Call the API to update the store
       await saveStoreEnv(data, storeNameFromQuery);
-      // Clear inputs and show success popup
+      setPayload(data); // Update context with form data
       form.reset(initialFormData);
       setCurrentStep(0);
       setStepCompletionStatus([false, false]);
       setStepValidationStatus([false, false]);
-      setShowSuccessModal(true);
+      router.push("/socketEditor");
     } catch (error) {
-      console.error(error);
+      console.error("Submit error:", error);
     }
   };
 
@@ -432,20 +423,6 @@ export default function StoreEditorForm() {
   return (
     <Form {...form}>
       <div className="max-w-4xl mx-auto bg-white dark:bg-background rounded-lg shadow-md p-4 sm:p-6">
-        {showSuccessModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white dark:bg-background rounded-lg shadow-lg w-full max-w-md p-6">
-              <p className="text-sm text-muted-foreground mb-4">
-                Submitted successfully.
-              </p>
-              <div className="flex justify-end gap-2">
-                <Button onClick={() => router.push("/allCustomers")}>
-                  Go to Customers
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
         <StepIndicator
           steps={steps}
           currentStep={currentStep}

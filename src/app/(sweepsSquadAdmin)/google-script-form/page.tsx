@@ -1,18 +1,18 @@
 'use client';
- 
-import { useState } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { io, Socket } from 'socket.io-client';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Code, CheckCircle } from 'lucide-react';
-import { StorePayload } from '@/utils/storeContext';
 import { StoreSelect } from '@/components/common/storefront';
- 
+
 interface Store {
   store_id: string;
   storeName: string;
@@ -24,19 +24,16 @@ interface Store {
   updated_at: string;
 }
 
-// Define the Zod schema for form validation
 const scriptFormSchema = z.object({
-  headScript: z.string().min(1, "Head script is required"),
-  bodyScript: z.string().min(1, "Body script is required"),
+  headScript: z.string().min(1, "Google Ads ID is required"),
+  bodyScript: z.string().min(1, "Synchronis ID is required"),
 });
 
-// Define the form data type
 export type ScriptFormData = z.infer<typeof scriptFormSchema>;
 
-// Initial form data
 const initialFormData: ScriptFormData = {
-  headScript: "",
-  bodyScript: "",
+  headScript: '',
+  bodyScript: '',
 };
 
 export default function GoogleScriptForm() {
@@ -45,86 +42,75 @@ export default function GoogleScriptForm() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
-  // Utility to map Store to StorePayload (add more fields as needed)
-  function storeToStorePayload(store: Store): StorePayload {
-    return {
-      VITE_STORE_TITLE: store.storeName,
-      VITE_STORE_NAME: store.storeName,
-      VITE_CUSTOMER_SUPPORT_EMAIL: store.email,
-      VITE_CUSTOMER_SERVICE_PHONE: store.phone,
-      VITE_DOMAIN_NAME: "",
-      VITE_CATEGORY: "",
-      VITE_LANGUAGE: "",
-      VITE_COLOR1: "",
-      VITE_COLOR2: "",
-      VITE_TYPOGRAPHY: "",
-      VITE_COMPANY_NAME: "",
-      VITE_COMPANY_ADDRESS: "",
-      VITE_CHECKOUT_DOMAIN: "",
-      VITE_CHECKOUT_ID: "",
-      VITE_OFFER_ID_TYPE: "",
-      // Add more fields as needed, or map from store if available
-    };
-  }
+  const socketRef = useRef<Socket | null>(null);
 
-  // Initialize React Hook Form
+  // Setup Socket.IO connection
+  useEffect(() => {
+    const serverUrl = `http://51.112.151.1`; // Adjust to your backend URL
+    socketRef.current = io(serverUrl, {
+      transports: ['websocket', 'polling'],
+      path: '/backend/socket.io',
+      forceNew: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1500,
+    });
+
+    const socket = socketRef.current;
+
+    socket.on('connect', () => {
+      console.log('Connected to socket');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from socket');
+    });
+
+    socket.on('shopify:success', () => {
+      setSubmitSuccess(true);
+      setIsSubmitting(false);
+    });
+
+    socket.on('shopify:error', (data: { message: string }) => {
+      setSubmitError(data.message || 'Failed to save scripts');
+      setIsSubmitting(false);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   const form = useForm<ScriptFormData>({
     resolver: zodResolver(scriptFormSchema),
     defaultValues: initialFormData,
-    mode: "onChange",
+    mode: 'onChange',
   });
 
-  // Handle form submission
-  const handleSubmit = async (data: ScriptFormData) => {
+  const handleSubmit = (data: ScriptFormData) => {
     setIsSubmitting(true);
     setSubmitError(null);
+
     if (!selectedStore) {
-      setSubmitError("Please select a store (theme) before submitting.");
+      setSubmitError('Please select a store (theme) before submitting.');
       setIsSubmitting(false);
       return;
     }
-    try {
-      // Send API request to /store/google-scripts
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/google-scripts`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          storeId: selectedStore.store_id,
-          googleAdsId: data.headScript,
-          synchronisId: data.bodyScript,
-        }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (
-          typeof errorData === "object" &&
-          errorData !== null &&
-          "message" in errorData
-        ) {
-          throw new Error(
-            (errorData as { message?: string }).message ||
-              "Failed to save scripts"
-          );
-        } else {
-          throw new Error("Failed to save scripts");
-        }
-      }
-      // Set success state
-      setSubmitSuccess(true);
-    } catch (error) {
-      console.error("Error submitting scripts:", error);
-      setSubmitError(
-        (error as Error).message ||
-          "There was an error saving your scripts. Please try again."
-      );
-    } finally {
+
+    const payload = {
+      name: selectedStore.storeName,
+      googleAdsId: data.headScript,
+      synchronisId: data.bodyScript,
+    };
+
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('shopify:update', payload);
+    } else {
+      setSubmitError('Socket not connected. Please try again.');
       setIsSubmitting(false);
     }
   };
 
-  // Reset the form
   const resetForm = () => {
     form.reset(initialFormData);
     setIsSubmitting(false);
@@ -160,7 +146,6 @@ export default function GoogleScriptForm() {
 
   return (
     <div className="max-w-4xl mx-auto bg-white dark:bg-background rounded-lg shadow-md p-6">
-      {/* Store Select Box */}
       <StoreSelect onSelect={setSelectedStore} />
       <Card>
         <CardHeader>
@@ -181,19 +166,13 @@ export default function GoogleScriptForm() {
 
         <CardContent>
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-6"
-            >
-              {/* Google Ads ID Field */}
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="headScript"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">
-                      Google Ads ID
-                    </FormLabel>
+                    <FormLabel className="text-base font-medium">Google Ads ID</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Enter your Google Ads ID here..."
@@ -209,15 +188,12 @@ export default function GoogleScriptForm() {
                 )}
               />
 
-              {/* Synchronis ID Field */}
               <FormField
                 control={form.control}
                 name="bodyScript"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">
-                      Synchronis ID
-                    </FormLabel>
+                    <FormLabel className="text-base font-medium">Synchronis ID</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Enter your Synchronis ID here..."
@@ -233,14 +209,12 @@ export default function GoogleScriptForm() {
                 )}
               />
 
-              {/* Error Alert */}
               {submitError && (
                 <Alert variant="destructive">
                   <AlertDescription>{submitError}</AlertDescription>
                 </Alert>
               )}
 
-              {/* Submit Button */}
               <div className="flex justify-end space-x-4">
                 <Button
                   type="button"
@@ -262,7 +236,7 @@ export default function GoogleScriptForm() {
                       Saving...
                     </>
                   ) : (
-                    "Save IDs"
+                    'Save IDs'
                   )}
                 </Button>
               </div>
