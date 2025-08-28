@@ -148,7 +148,7 @@ export default function StoreEditor() {
   };
 
   useEffect(() => {
-    const serverUrl = `http://192.168.1.28:1000`;
+    const serverUrl = `http://51.112.151.1`;
 
     socketRef.current = io(serverUrl, {
       transports: ["websocket", "polling"],
