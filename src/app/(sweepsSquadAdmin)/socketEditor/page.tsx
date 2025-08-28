@@ -152,7 +152,7 @@ export default function StoreEditor() {
 
     socketRef.current = io(serverUrl, {
       transports: ["websocket", "polling"],
-      // path: "/backend/socket.io",
+      path: "/backend/socket.io",
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1500,
