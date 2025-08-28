@@ -1,49 +1,97 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Form } from '@/components/ui/form';
-import StoreBasics from './steps/StoreBasics';
-import LegalInformation from './steps/LegalInformation';
-import StepIndicator from './StepIndicator';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { io, Socket } from 'socket.io-client';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form } from "@/components/ui/form";
+import StoreBasics from "./steps/StoreBasics";
+import LegalInformation from "./steps/LegalInformation";
+import StepIndicator from "./StepIndicator";
+import { useSearchParams, useRouter } from "next/navigation";
+import { io, Socket } from "socket.io-client";
+import { useStoreContext } from "@/utils/storeContext";
 
-// Define the Zod schema for form validation (only relevant fields)
+// Define the Zod schema for form validation
 const storeEditorFormSchema = z.object({
-  VITE_STORE_TITLE: z.string().min(1, 'Store title is required'),
-  VITE_STORE_NAME: z.string().min(1, 'Store name is required'),
-  VITE_CUSTOMER_SUPPORT_EMAIL: z.string().email('Please enter a valid customer support email address'),
-  VITE_CUSTOMER_SERVICE_PHONE: z.string().min(1, 'Please enter a valid customer service phone number'),
-  VITE_DOMAIN_NAME: z.string().min(1, 'Domain name is required'),
-  VITE_SHOPIFY_EMAIL: z.string().email('Please enter a valid Shopify email address').optional(),
-  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: z.string().min(1, 'Shopify Admin Access Token is required'),
-  VITE_SHOPIFY_URL: z.string().min(1, 'Shopify Store URL is required'),
-  VITE_COMPANY_NAME: z.string().min(1, 'Company name is required'),
-  VITE_COMPANY_ADDRESS: z.string().min(1, 'Company address is required'),
+  VITE_STORE_TITLE: z.string().min(1, "Store title is required"),
+  VITE_STORE_NAME: z.string().min(1, "Store name is required"),
+  VITE_CUSTOMER_SUPPORT_EMAIL: z
+    .string()
+    .email("Please enter a valid customer support email address"),
+  VITE_CUSTOMER_SERVICE_PHONE: z
+    .string()
+    .min(1, "Please enter a valid customer service phone number"),
+  VITE_DOMAIN_NAME: z.string().min(1, "Domain name is required"),
+  VITE_SHOPIFY_EMAIL: z
+    .string()
+    .email("Please enter a valid Shopify email address")
+    .optional(),
+  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: z
+    .string()
+    .min(1, "Shopify Admin Access Token is required"),
+  VITE_SHOPIFY_URL: z.string().min(1, "Shopify Store URL is required"),
+  VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
+  VITE_COMPANY_ADDRESS: z.string().min(1, "Company address is required"),
+  VITE_SIREN_NUMBER: z
+    .string()
+    .min(1, "Company business registration number / SIREN is required"),
+  VITE_PP_LAST_UPDATED_DATE: z.string().min(1, "Policy updated at is required"),
+  VITE_BUSINESS_HOURS: z.string().min(1, "Business hours are required"),
+  VITE_REFUND_PERIOD: z.string().min(1, "Refund period is required"),
+  VITE_REFUND_PROCESSING_TIME: z
+    .string()
+    .min(1, "Refund processing time is required"),
+  VITE_DELIVERY_PROVIDER: z.string().min(1, "Delivery provider is required"),
+  VITE_ORDER_PROCESSING_TIME: z
+    .string()
+    .min(1, "Order processing time is required"),
+  VITE_STANDARD_DELIVERY_TIME: z
+    .string()
+    .min(1, "Standard delivery time is required"),
+  VITE_RETURN_PERIOD: z.string().min(1, "Return period is required"),
+  VITE_DELIVERY_AREAS: z.string().min(1, "Delivery areas are required"),
+  VITE_SUPPORT_HOURS: z.string().min(1, "Support hours are required"),
+  VITE_WITHDRAWAL_PERIOD: z.string().optional(),
+  VITE_RETURN_SHIPPING_POLICY: z
+    .string()
+    .min(1, "Return shipping policy is required"),
+  VITE_SALE_ITEMS_POLICY: z.string().min(1, "Sale items policy is required"),
+  VITE_TC_LAST_UPDATED_DATE: z.string().min(1, "T&C updated at is required"),
 });
 
 export type StoreEditorFormData = z.infer<typeof storeEditorFormSchema>;
-
 const initialFormData: Partial<StoreEditorFormData> = {
-  VITE_STORE_TITLE: '',
-  VITE_STORE_NAME: '',
-  VITE_CUSTOMER_SUPPORT_EMAIL: '',
-  VITE_CUSTOMER_SERVICE_PHONE: '',
-  VITE_DOMAIN_NAME: '',
-  VITE_SHOPIFY_EMAIL: '',
-  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: '',
-  VITE_SHOPIFY_URL: '',
-  VITE_COMPANY_NAME: '',
-  VITE_COMPANY_ADDRESS: '',
+  VITE_STORE_TITLE: "",
+  VITE_STORE_NAME: "",
+  VITE_CUSTOMER_SUPPORT_EMAIL: "",
+  VITE_CUSTOMER_SERVICE_PHONE: "",
+  VITE_DOMAIN_NAME: "",
+  VITE_SHOPIFY_EMAIL: "",
+  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: "",
+  VITE_SHOPIFY_URL: "",
+  VITE_COMPANY_NAME: "",
+  VITE_COMPANY_ADDRESS: "",
+  VITE_SIREN_NUMBER: "",
+  VITE_PP_LAST_UPDATED_DATE: "",
+  VITE_BUSINESS_HOURS: "",
+  VITE_REFUND_PERIOD: "",
+  VITE_REFUND_PROCESSING_TIME: "",
+  VITE_DELIVERY_PROVIDER: "",
+  VITE_ORDER_PROCESSING_TIME: "",
+  VITE_STANDARD_DELIVERY_TIME: "",
+  VITE_RETURN_PERIOD: "",
+  VITE_DELIVERY_AREAS: "",
+  VITE_SUPPORT_HOURS: "",
+  VITE_WITHDRAWAL_PERIOD: "",
+  VITE_RETURN_SHIPPING_POLICY: "",
+  VITE_SALE_ITEMS_POLICY: "",
+  VITE_TC_LAST_UPDATED_DATE: "",
 };
 
 const steps = [
-  { id: 'basics', name: 'Store Basics' },
-  { id: 'legal', name: 'Legal Information' },
+  { id: "basics", name: "Store Basics" },
+  { id: "legal", name: "Legal Information" },
 ];
 
 // API response type
@@ -60,6 +108,21 @@ type EnvResponse = {
     shopifyAdminToken?: string;
     companyName?: string;
     companyAddress?: string;
+    companyBusinessNumber?: string;
+    policyUpdatedAt?: string;
+    businessHours?: string;
+    refundPeriod?: string;
+    refundProcessingTime?: string;
+    deliveryProvider?: string;
+    orderProcessingTime?: string;
+    standardDeliveryTime?: string;
+    returnPeriod?: string;
+    deliveryAreas?: string;
+    supportHours?: string;
+    withdrawalPeriod?: string;
+    returnShippingPolicy?: string;
+    saleItemsPolicy?: string;
+    termsOfServiceUpdateAt?: string;
   };
 };
 
@@ -67,6 +130,7 @@ type EnvResponse = {
 function buildUpdatePayload(values: StoreEditorFormData) {
   return {
     name: values.VITE_STORE_NAME,
+    storeTitle: values.VITE_STORE_TITLE,
     email: values.VITE_CUSTOMER_SUPPORT_EMAIL,
     phone: values.VITE_CUSTOMER_SERVICE_PHONE,
     domainName: values.VITE_DOMAIN_NAME,
@@ -75,66 +139,91 @@ function buildUpdatePayload(values: StoreEditorFormData) {
     shopifyAdminToken: values.VITE_SHOPIFY_ADMIN_ACCESS_TOKEN,
     companyName: values.VITE_COMPANY_NAME,
     companyAddress: values.VITE_COMPANY_ADDRESS,
+    companyBusinessNumber: values.VITE_SIREN_NUMBER,
+    policyUpdatedAt: values.VITE_PP_LAST_UPDATED_DATE,
+    businessHours: values.VITE_BUSINESS_HOURS,
+    refundPeriod: values.VITE_REFUND_PERIOD,
+    refundProcessingTime: values.VITE_REFUND_PROCESSING_TIME,
+    deliveryProvider: values.VITE_DELIVERY_PROVIDER,
+    deliveryAreas: values.VITE_DELIVERY_AREAS,
+    orderProcessingTime: values.VITE_ORDER_PROCESSING_TIME,
+    standardDeliveryTime: values.VITE_STANDARD_DELIVERY_TIME,
+    returnPeriod: values.VITE_RETURN_PERIOD,
+    supportHours: values.VITE_SUPPORT_HOURS,
+    withdrawalPeriod: values.VITE_WITHDRAWAL_PERIOD,
+    returnShippingPolicy: values.VITE_RETURN_SHIPPING_POLICY,
+    saleItemsPolicy: values.VITE_SALE_ITEMS_POLICY,
+    termsOfServiceUpdateAt: values.VITE_TC_LAST_UPDATED_DATE,
   };
 }
 
 // Persist the latest form values to the server
-async function saveStoreEnv(values: StoreEditorFormData, storeNameFallback?: string) {
-  const candidateName = (values.VITE_STORE_NAME || '').trim();
-  const storeName = candidateName || (storeNameFallback || '').trim();
+async function saveStoreEnv(
+  values: StoreEditorFormData,
+  storeNameFallback?: string
+) {
+  const candidateName = (values.VITE_STORE_NAME || "").trim();
+  const storeName = candidateName || (storeNameFallback || "").trim();
   if (!storeName) return;
-
 }
 
 export default function StoreEditorForm() {
+  const { setPayload } = useStoreContext(); // Access context to update payload
   const [currentStep, setCurrentStep] = useState(0);
-  const [stepCompletionStatus, setStepCompletionStatus] = useState<boolean[]>([false, false]);
-  const [stepValidationStatus, setStepValidationStatus] = useState<boolean[]>([false, false]);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [stepCompletionStatus, setStepCompletionStatus] = useState<boolean[]>([
+    false,
+    false,
+  ]);
+  const [stepValidationStatus, setStepValidationStatus] = useState<boolean[]>([
+    false,
+    false,
+  ]);
 
   const searchParams = useSearchParams();
-  const storeNameFromQuery = searchParams.get('storeName') || '';
+  const storeNameFromQuery = searchParams.get("storeName") || "";
   const router = useRouter();
 
   const form = useForm<StoreEditorFormData>({
     resolver: zodResolver(storeEditorFormSchema),
     defaultValues: initialFormData,
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const { trigger, getValues, formState, watch } = form;
 
-  // Socket.IO setup (mirror socket page approach)
+  // Socket.IO setup
   const socketRef = useRef<Socket | null>(null);
   useEffect(() => {
-    const serverUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
+    const serverUrl = `http://51.112.151.1`;
     socketRef.current = io(serverUrl, {
-      transports: ['websocket', 'polling'],
+      transports: ["websocket", "polling"],
+      path: "/backend/socket.io",
+      forceNew: true,
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1500,
     });
     const socket = socketRef.current;
 
-    socket.on('connect', () => {
-      // connected
+    socket.on("connect", () => {
+      console.log("Socket.IO connected");
     });
 
-    socket.on('disconnect', () => {
-      // disconnected
+    socket.on("disconnect", () => {
+      console.log("Socket.IO disconnected");
     });
 
-    // Shopify auth flow handlers
-    socket.on('shopify:authurl', (data: unknown) => {
-      if (typeof data === 'string' && data.startsWith('http')) {
-        window.alert('Please login to Shopify to continue updating. A login window will open.');
-        window.open(data, '_blank');
+    socket.on("shopify:authurl", (data: unknown) => {
+      if (typeof data === "string" && data.startsWith("http")) {
+        window.alert(
+          "Please login to Shopify to continue updating. A login window will open."
+        );
+        window.open(data, "_blank");
       }
     });
 
-    socket.on('shopify:authcode', (data: { authCode?: string } | unknown) => {
-      // Optional: indicate auth started
-      // console.log('Auth code received:', (data as { authCode?: string })?.authCode);
+    socket.on("shopify:authcode", (data: { authCode?: string } | unknown) => {
+      console.log("Auth code received:", (data as { authCode?: string })?.authCode);
     });
 
     return () => {
@@ -150,51 +239,70 @@ export default function StoreEditorForm() {
     const fetchAndPopulate = async () => {
       if (!storeNameFromQuery) return;
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/backend/store/env?storeName=${encodeURIComponent(storeNameFromQuery)}`, {
-          method: 'GET',
-          signal: controller.signal,
-        });
+        const res = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_BACKEND_URL
+          }/store/env?storeName=${encodeURIComponent(storeNameFromQuery)}`,
+          {
+            method: "GET",
+            signal: controller.signal,
+          }
+        );
         if (!res.ok) return;
         const json = (await res.json()) as EnvResponse;
         const d = json?.data || {};
-        form.reset({
-          VITE_STORE_TITLE: d.storeTitle || '',
+        const formData = {
+          VITE_STORE_TITLE: d.storeTitle || "",
           VITE_STORE_NAME: storeNameFromQuery,
-          VITE_CUSTOMER_SUPPORT_EMAIL: d.email || '',
-          VITE_CUSTOMER_SERVICE_PHONE: d.phone || '',
-          VITE_DOMAIN_NAME: d.domainName || '',
-          VITE_SHOPIFY_EMAIL: d.shopifyEmail || '',
-          VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: d.shopifyAdminToken || '',
-          VITE_SHOPIFY_URL: d.shopifyUrl || '',
-          VITE_COMPANY_NAME: d.companyName || '',
-          VITE_COMPANY_ADDRESS: d.companyAddress || '',
-        });
+          VITE_CUSTOMER_SUPPORT_EMAIL: d.email || "",
+          VITE_CUSTOMER_SERVICE_PHONE: d.phone || "",
+          VITE_DOMAIN_NAME: d.domainName || "",
+          VITE_SHOPIFY_EMAIL: d.shopifyEmail || "",
+          VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: d.shopifyAdminToken || "",
+          VITE_SHOPIFY_URL: d.shopifyUrl || "",
+          VITE_COMPANY_NAME: d.companyName || "",
+          VITE_COMPANY_ADDRESS: d.companyAddress || "",
+          VITE_SIREN_NUMBER: d.companyBusinessNumber || "",
+          VITE_PP_LAST_UPDATED_DATE: d.policyUpdatedAt || "",
+          VITE_TC_LAST_UPDATED_DATE: d.termsOfServiceUpdateAt || "",
+          VITE_BUSINESS_HOURS: d.businessHours || "",
+          VITE_REFUND_PERIOD: d.refundPeriod || "",
+          VITE_REFUND_PROCESSING_TIME: d.refundProcessingTime || "",
+          VITE_DELIVERY_PROVIDER: d.deliveryProvider || "",
+          VITE_ORDER_PROCESSING_TIME: d.orderProcessingTime || "",
+          VITE_STANDARD_DELIVERY_TIME: d.standardDeliveryTime || "",
+          VITE_RETURN_PERIOD: d.returnPeriod || "",
+          VITE_DELIVERY_AREAS: d.deliveryAreas || "",
+          VITE_SUPPORT_HOURS: d.supportHours || "",
+          VITE_WITHDRAWAL_PERIOD: d.withdrawalPeriod || "",
+          VITE_RETURN_SHIPPING_POLICY: d.returnShippingPolicy || "",
+          VITE_SALE_ITEMS_POLICY: d.saleItemsPolicy || "",
+        };
+        form.reset(formData);
+        setPayload(formData); // Update context with fetched data
       } catch {
-        // ignore fetch errors for prefill
+        console.log("Fetch error for prefill ignored");
       }
     };
     fetchAndPopulate();
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeNameFromQuery]);
+  }, [storeNameFromQuery, form, setPayload]);
 
   useEffect(() => {
     const subscription = watch(() => {
       updateValidationStatus();
     });
     return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch]);
 
   useEffect(() => {
     updateValidationStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const emitShopifyUpdate = (values: StoreEditorFormData) => {
     const payload = buildUpdatePayload(values);
     if (socketRef.current && socketRef.current.connected) {
-      socketRef.current.emit('shopify:update', JSON.stringify(payload));
+      socketRef.current.emit("shopify:update", JSON.stringify(payload));
     }
   };
 
@@ -258,17 +366,34 @@ export default function StoreEditorForm() {
     switch (step) {
       case 0:
         return [
-          'VITE_STORE_TITLE',
-          'VITE_STORE_NAME',
-          'VITE_CUSTOMER_SUPPORT_EMAIL',
-          'VITE_CUSTOMER_SERVICE_PHONE',
-          'VITE_DOMAIN_NAME',
-          'VITE_SHOPIFY_ADMIN_ACCESS_TOKEN',
-          'VITE_SHOPIFY_URL',
-          // Optional array; not part of required validation
+          "VITE_STORE_TITLE",
+          "VITE_STORE_NAME",
+          "VITE_CUSTOMER_SUPPORT_EMAIL",
+          "VITE_CUSTOMER_SERVICE_PHONE",
+          "VITE_DOMAIN_NAME",
+          "VITE_SHOPIFY_ADMIN_ACCESS_TOKEN",
+          "VITE_SHOPIFY_URL",
         ];
       case 1:
-        return ['VITE_COMPANY_NAME', 'VITE_COMPANY_ADDRESS'];
+        return [
+          "VITE_COMPANY_NAME",
+          "VITE_COMPANY_ADDRESS",
+          "VITE_SIREN_NUMBER",
+          "VITE_PP_LAST_UPDATED_DATE",
+          "VITE_TC_LAST_UPDATED_DATE",
+          "VITE_BUSINESS_HOURS",
+          "VITE_REFUND_PERIOD",
+          "VITE_REFUND_PROCESSING_TIME",
+          "VITE_DELIVERY_PROVIDER",
+          "VITE_ORDER_PROCESSING_TIME",
+          "VITE_STANDARD_DELIVERY_TIME",
+          "VITE_RETURN_PERIOD",
+          "VITE_DELIVERY_AREAS",
+          "VITE_SUPPORT_HOURS",
+          "VITE_WITHDRAWAL_PERIOD",
+          "VITE_RETURN_SHIPPING_POLICY",
+          "VITE_SALE_ITEMS_POLICY",
+        ];
       default:
         return [];
     }
@@ -276,18 +401,16 @@ export default function StoreEditorForm() {
 
   const handleSubmit = async (data: StoreEditorFormData) => {
     try {
-      // Emit final update before submit
       emitShopifyUpdate(data);
-      // Call the API to update the store
       await saveStoreEnv(data, storeNameFromQuery);
-      // Clear inputs and show success popup
+      setPayload(data); // Update context with form data
       form.reset(initialFormData);
       setCurrentStep(0);
       setStepCompletionStatus([false, false]);
       setStepValidationStatus([false, false]);
-      setShowSuccessModal(true);
+      router.push("/socketEditor");
     } catch (error) {
-      console.error(error);
+      console.error("Submit error:", error);
     }
   };
 
@@ -300,16 +423,6 @@ export default function StoreEditorForm() {
   return (
     <Form {...form}>
       <div className="max-w-4xl mx-auto bg-white dark:bg-background rounded-lg shadow-md p-4 sm:p-6">
-        {showSuccessModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white dark:bg-background rounded-lg shadow-lg w-full max-w-md p-6">
-              <p className="text-sm text-muted-foreground mb-4">Submitted successfully.</p>
-              <div className="flex justify-end gap-2">
-                <Button onClick={() => router.push('/allCustomers')}>Go to Customers</Button>
-              </div>
-            </div>
-          </div>
-        )}
         <StepIndicator
           steps={steps}
           currentStep={currentStep}
@@ -318,11 +431,13 @@ export default function StoreEditorForm() {
           stepCompletionStatus={stepCompletionStatus}
         />
         <div className="mt-8">
-          {currentStep === 0 && (
-            <StoreBasics form={form} nextStep={nextStep} />
-          )}
+          {currentStep === 0 && <StoreBasics form={form} nextStep={nextStep} />}
           {currentStep === 1 && (
-            <LegalInformation form={form} nextStep={submitFinalStep} prevStep={prevStep} />
+            <LegalInformation
+              form={form}
+              nextStep={submitFinalStep}
+              prevStep={prevStep}
+            />
           )}
         </div>
       </div>

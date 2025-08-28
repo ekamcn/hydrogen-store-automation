@@ -1,10 +1,72 @@
-'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useStoreContext, createEmptyPayload, StorePayload } from '@/utils/storeContext';
-import { Button } from '@/components/ui/button';
-import { Socket ,io } from 'socket.io-client';
-import { buildStorePayload, DEFAULT_IMAGE_DATA } from '@/components/common/storefront';
-// Type for message data that's safely serializable
+// StoreCreator.tsx
+"use client";
+
+import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { io, Socket } from "socket.io-client";
+import { useStoreContext } from "@/utils/storeContext";
+import { buildStorePayload } from "@/components/common/storefront";
+import { useSearchParams } from "next/navigation";
+
+// Define the type for the context payload (only relevant fields)
+interface StorePayload {
+  VITE_STORE_TITLE?: string;
+  VITE_STORE_NAME?: string;
+  VITE_CUSTOMER_SUPPORT_EMAIL?: string;
+  VITE_CUSTOMER_SERVICE_PHONE?: string;
+  VITE_DOMAIN_NAME?: string;
+  VITE_SHOPIFY_EMAIL?: string;
+  VITE_SHOPIFY_ADMIN_ACCESS_TOKEN?: string;
+  VITE_SHOPIFY_URL?: string;
+  VITE_COMPANY_NAME?: string;
+  VITE_COMPANY_ADDRESS?: string;
+  VITE_SIREN_NUMBER?: string;
+  VITE_PP_LAST_UPDATED_DATE?: string;
+  VITE_BUSINESS_HOURS?: string;
+  VITE_REFUND_PERIOD?: string;
+  VITE_REFUND_PROCESSING_TIME?: string;
+  VITE_DELIVERY_PROVIDER?: string;
+  VITE_ORDER_PROCESSING_TIME?: string;
+  VITE_STANDARD_DELIVERY_TIME?: string;
+  VITE_RETURN_PERIOD?: string;
+  VITE_DELIVERY_AREAS?: string;
+  VITE_SUPPORT_HOURS?: string;
+  VITE_WITHDRAWAL_PERIOD?: string;
+  VITE_RETURN_SHIPPING_POLICY?: string;
+  VITE_SALE_ITEMS_POLICY?: string;
+  VITE_TC_LAST_UPDATED_DATE?: string;
+}
+
+// Define the type for storeData (only relevant fields)
+interface StoreData {
+  storeTitle?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  domainName?: string;
+  shopifyEmail?: string;
+  shopifyAdminToken?: string;
+  shopifyUrl?: string;
+  companyName?: string;
+  companyAddress?: string;
+  companyBusinessNumber?: string;
+  policyUpdatedAt?: string;
+  businessHours?: string;
+  refundPeriod?: string;
+  refundProcessingTime?: string;
+  deliveryProvider?: string;
+  orderProcessingTime?: string;
+  standardDeliveryTime?: string;
+  returnPeriod?: string;
+  deliveryAreas?: string;
+  supportHours?: string;
+  withdrawalPeriod?: string;
+  returnShippingPolicy?: string;
+  saleItemsPolicy?: string;
+  termsOfServiceUpdateAt?: string;
+}
+
+// Type for message data
 type MessageData = {
   [key: string]:
     | string
@@ -16,25 +78,21 @@ type MessageData = {
     | Array<string | number | boolean | null | undefined | MessageData>;
 };
 
-export default function PayloadPage() {
-  const { payload } = useStoreContext();
-
-  // Initialize local payload from localStorage first
-  const [localPayload, setLocalPayload] = useState<StorePayload>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("store-payload");
-      if (stored) {
-        try {
-          return JSON.parse(stored) as StorePayload;
-        } catch (err) {
-          console.error("Invalid payload in localStorage:", err);
-          return createEmptyPayload();
-        }
-      }
-    }
-    return createEmptyPayload();
+// Function to convert a file to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64String = reader.result?.toString().split(",")[1];
+      resolve(base64String || "");
+    };
+    reader.onerror = (error) => reject(error);
   });
+};
 
+export default function StoreEditor() {
+  const { payload: contextPayload } = useStoreContext();
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState<
     Array<{
@@ -53,7 +111,27 @@ export default function PayloadPage() {
     isProcessing: boolean;
   }>({ isProcessing: false });
 
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoBase64, setLogoBase64] = useState<string>("");
+
   const socketRef = useRef<Socket | null>(null);
+  const searchParams = useSearchParams();
+  const storeNameFromQuery = searchParams.get("storeName") || "";
+
+  // Handle file input change
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        setLogoFile(file);
+        const base64 = await fileToBase64(file);
+        setLogoBase64(base64);
+      } catch (error) {
+        console.error("Error converting file to base64:", error);
+        addMessage("error", "Failed to process logo file");
+      }
+    }
+  };
 
   // Add message to the list with unique ID generator
   const messageIdRef = useRef(0);
@@ -70,27 +148,26 @@ export default function PayloadPage() {
   };
 
   useEffect(() => {
-        // const serverUrl = "${process.env.NEXT_PUBLIC_BACKEND_URL}";
-    const serverUrl = `http://51.112.151.1`;
+    const serverUrl = `http://192.168.1.28:1000`;
+
     socketRef.current = io(serverUrl, {
       transports: ["websocket", "polling"],
-      path: "/backend/socket.io",
+      // path: "/backend/socket.io",
       reconnection: true,
-      forceNew: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1500,
+      forceNew: true,
     });
 
     const socket = socketRef.current;
-    console.log("Connecting to Socket.IO server at:", serverUrl);
-    // Connection event handlers
+
     socket.on("connect", () => {
       console.log("Socket.IO connected ✅");
       setIsConnected(true);
       addMessage("system", "Socket.IO connected successfully");
       addMessage(
         "info",
-        'Ready to create Shopify store. Click "Create Shopify Store" to begin.'
+        'Ready to update Shopify store. Click "Update Hydrogen Store" to proceed.'
       );
     });
 
@@ -100,7 +177,19 @@ export default function PayloadPage() {
       addMessage("system", `Socket.IO disconnected: ${reason}`);
     });
 
-    // Server event handlers - These are events sent FROM server TO client
+    socket.on("shopify:authurl", (data) => {
+      console.log("Received shopify:authurl:", data);
+      addMessage(
+        "shopify:authurl",
+        `🔗 Auth URL Generated: ${data.authUrl || "N/A"}`,
+        data
+      );
+      setShopifyStatus((prev) => ({ ...prev, authUrl: data.authUrl }));
+      if (typeof data === "string" && data.startsWith("http")) {
+        window.open(data, "_blank");
+      }
+    });
+
     socket.on("shopify:authcode", (data) => {
       console.log("Received shopify:authcode:", data);
       addMessage(
@@ -113,22 +202,6 @@ export default function PayloadPage() {
         authCode: data.authCode,
         isProcessing: true,
       }));
-    });
-
-    socket.on("shopify:authurl", (data) => {
-      console.log("Received shopify:authurl:", data);
-
-      addMessage(
-        "shopify:authurl",
-        `🔗 Auth URL Generated: ${data || "N/A"}`,
-        data
-      );
-      setShopifyStatus((prev) => ({ ...prev, authUrl: data }));
-
-      // ✅ Open auth URL in a new tab
-      if (typeof data === "string" && data.startsWith("http")) {
-        window.open(data, "_blank");
-      }
     });
 
     socket.on("shopify:status", (data) => {
@@ -145,7 +218,7 @@ export default function PayloadPage() {
       console.log("Received shopify:failure:", data);
       addMessage(
         "shopify:failure",
-        `❌ Process Failed: ${data.message || data.error || "Unknown error"}`,
+        `❌ Update Failed: ${data.message || data.error || "Unknown error"}`,
         data
       );
       setShopifyStatus((prev) => ({ ...prev, isProcessing: false }));
@@ -153,10 +226,12 @@ export default function PayloadPage() {
 
     socket.on("shopify:success", (data) => {
       console.log("Received shopify:success:", data);
-      addMessage("shopify:success", `✅ Process Completed Successfully!`, data);
+      addMessage(
+        "shopify:success",
+        "✅ Shopify store has been updated successfully!",
+        data
+      );
       setShopifyStatus((prev) => ({ ...prev, isProcessing: false }));
-      localStorage.removeItem("store-payload");
-      setLocalPayload(createEmptyPayload());
     });
 
     socket.on("shopify:storeurl", (data) => {
@@ -173,7 +248,6 @@ export default function PayloadPage() {
       }));
     });
 
-    // Cleanup on unmount
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -181,59 +255,80 @@ export default function PayloadPage() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   // Function to create Shopify store - This sends the main event to server
-
-  //   };
-
-  //   // Only create store if we have payload data and socket is connected
-  //   if (Object.keys(localPayload || {}).length > 0 && isConnected) {
-  //     createShopifyStore();
-  //   }
-  // },[localPayload, payload, isConnected]);
-
-  // Save to localStorage when payload is updated (only if it has meaningful data)
-
-  const createShopifyStore = () => {
+  const updateShopifyStore = () => {
     if (socketRef.current && socketRef.current.connected) {
-      const storeData = buildStorePayload(localPayload);
-      socketRef.current.emit('shopify:create', JSON.stringify(storeData?.storeData), storeData.imageData ??  DEFAULT_IMAGE_DATA);
-      console.log('🚀 Sent shopify:create event to server with payload:', storeData);
-      addMessage('client:sent', '🚀 Shopify store creation request sent to server', storeData as unknown as MessageData);
-      addMessage('info', '⏳ Waiting for server response...');
+      const storeData = buildStorePayload({
+        ...contextPayload,
+        VITE_STORE_NAME: storeNameFromQuery || contextPayload.VITE_STORE_NAME,
+        VITE_LOGO: logoFile ? { base64: logoBase64, fileName: logoFile.name } : contextPayload.VITE_LOGO,
+      });
+
+      console.log(storeData,"storeData")
+      socketRef.current.emit(
+        "shopify:update",
+        JSON.stringify(storeData?.storeData),
+        storeData.imageData
+      );
+      console.log("✅ Server response payload:", storeData);
+      addMessage(
+        "client:sent",
+        "🚀 Shopify store update request sent to server",
+        storeData as unknown as MessageData
+      );
+      addMessage("info", "⏳ Waiting for server response...");
       setShopifyStatus((prev) => ({ ...prev, isProcessing: true }));
     } else {
       console.error("Socket.IO is not connected");
-      addMessage("error", "Cannot create store - Socket.IO not connected");
+      addMessage("error", "Cannot update store - Socket.IO not connected");
     }
   };
 
-  useEffect(() => {
-    // Check if payload has any non-empty values
-    const hasData =
-      payload &&
-      Object.values(payload).some(
-        (value) => value !== undefined && value !== null && value !== ""
-      );
-
-    if (hasData) {
-      localStorage.setItem("store-payload", JSON.stringify(payload));
-      setLocalPayload(payload);
-      console.log("Payload updated and saved to localStorage:", payload);
-    }
-  }, [payload]);
-
   return (
-    <div className="p-3">
-      {/* <h1 className="text-xl font-semibold mb-4">Payload Preview</h1>
-      {Object.keys(localPayload).length > 0 ? (
-        <>
-          <pre className="bg-gray-100 p-4 rounded text-sm">{JSON.stringify(localPayload, null, 2)}</pre>
-        </>
-      ) : (
-        <p className="text-gray-500">No payload available.</p>
-      )} */}
-      {/* Socket.IO Status */}
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <h3 className="font-semibold text-green-800 mb-3">
+          📋 Store Configuration
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+          <div>
+            <span className="font-medium text-green-700">Store Name:</span>
+            <span className="ml-2 text-gray-700">
+              {storeNameFromQuery || contextPayload.VITE_STORE_NAME || "Not specified"}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-green-700">Domain:</span>
+            <span className="ml-2 text-gray-700">
+              {contextPayload.VITE_DOMAIN_NAME || "Not specified"}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-green-700">Email:</span>
+            <span className="ml-2 text-gray-700">
+              {contextPayload.VITE_CUSTOMER_SUPPORT_EMAIL || "Not specified"}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-green-700">Phone:</span>
+            <span className="ml-2 text-gray-700">
+              {contextPayload.VITE_CUSTOMER_SERVICE_PHONE || "Not specified"}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-green-700">Shopify URL:</span>
+            <span className="ml-2 text-gray-700">
+              {contextPayload.VITE_SHOPIFY_URL || "Not specified"}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-green-700">Company:</span>
+            <span className="ml-2 text-gray-700">
+              {contextPayload.VITE_COMPANY_NAME || "Not specified"}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div className="mb-4 p-4 bg-gray-100 rounded-lg">
         <div className="flex items-center justify-between">
           <span>Socket.IO Status:</span>
@@ -247,19 +342,24 @@ export default function PayloadPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="mb-2"
+          />
           <Button
-            onClick={createShopifyStore}
+            onClick={updateShopifyStore}
             disabled={!isConnected || shopifyStatus.isProcessing}
             className="bg-blue-600 hover:bg-blue-700"
           >
             {shopifyStatus.isProcessing
-              ? "Creating Store..."
-              : "🏪 Create Shopify Store"}
+              ? "Updating Store..."
+              : "🏪 Update Hydrogen Store"}
           </Button>
         </div>
       </div>
 
-      {/* Shopify Process Status */}
       {(shopifyStatus.authCode ||
         shopifyStatus.authUrl ||
         shopifyStatus.status ||
@@ -267,7 +367,7 @@ export default function PayloadPage() {
         shopifyStatus.isProcessing) && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h3 className="font-semibold text-blue-800 mb-3 flex items-center">
-            🏪 Shopify Process Status
+            🏪 Shopify Update Status
             {shopifyStatus.isProcessing && (
               <div className="ml-2 flex items-center space-x-2">
                 <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
@@ -328,7 +428,6 @@ export default function PayloadPage() {
         </div>
       )}
 
-      {/* Messages Log */}
       {messages.length > 0 && (
         <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
           <h3 className="font-semibold text-gray-800 mb-2">
@@ -446,7 +545,6 @@ export default function PayloadPage() {
         </div>
       )}
 
-      {/* Information Panel */}
       <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
         <h3 className="font-semibold text-indigo-800 mb-2 flex items-center">
           ℹ️ How it works
@@ -454,8 +552,8 @@ export default function PayloadPage() {
         <div className="text-sm text-indigo-700 space-y-1">
           <p>
             <strong>Client Event:</strong>{" "}
-            <code className="bg-indigo-100 px-1 rounded">shopify:create</code> -
-            Sends store creation request to server
+            <code className="bg-indigo-100 px-1 rounded">shopify:update</code> -
+            Sends store update request to server
           </p>
           <p>
             <strong>Server Events:</strong> Server responds with multiple events
@@ -486,14 +584,14 @@ export default function PayloadPage() {
               <code className="bg-indigo-100 px-1 rounded">
                 shopify:success
               </code>{" "}
-              - Process completed successfully
+              - Update completed successfully
             </li>
             <li>
               •{" "}
               <code className="bg-indigo-100 px-1 rounded">
                 shopify:failure
               </code>{" "}
-              - Process failed
+              - Update failed
             </li>
             <li>
               •{" "}
