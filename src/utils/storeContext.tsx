@@ -24,7 +24,7 @@ export type StorePayload = {
   VITE_CHECKOUT_ID: string;
   VITE_SQUARE_LOGO?: { base64: string; fileName: string };
   VITE_OFFER_ID_TYPE: string;
-  customOfferIds?: Record<string, string | undefined>;
+  customOffers?: Record<string, string | undefined>;
   VITE_DISCOVER_OUR_COLLECTIONS?: string[];
   [key: string]:
     | string
@@ -80,7 +80,7 @@ export const createEmptyPayload = (): StorePayload => ({
   VITE_CHECKOUT_ID: "",
   VITE_SQUARE_LOGO: undefined,
   VITE_OFFER_ID_TYPE: "",
-  customOfferIds: {},
+  customOffers: {},
   VITE_DISCOVER_OUR_COLLECTIONS: [] as string[],
 });
 

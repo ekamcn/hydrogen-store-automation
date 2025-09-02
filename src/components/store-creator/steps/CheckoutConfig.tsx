@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { StoreFormData } from '../StoreCreatorForm';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { fileToBase64 } from '@/utils/fileToBase64';
+import { Plus, Trash } from 'lucide-react'; // for icons
 
 type CheckoutConfigProps = {
   form: UseFormReturn<StoreFormData>;
@@ -17,14 +18,21 @@ type CheckoutConfigProps = {
 };
 
 export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutConfigProps) {
+  // For dynamic custom offers
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "customOffers" as never, 
+  });
 
   return (
     <div className="space-y-6">
+      {/* Heading */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Checkout Configuration</h2>
         <p className="text-gray-600">Configure your store&apos;s checkout settings</p>
       </div>
 
+      {/* Other existing form fields (Domain, Checkout ID, Logo, etc.) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
           control={form.control}
@@ -123,43 +131,82 @@ export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutCon
           )}
         />
       </div>
-
       {form.watch('VITE_OFFER_ID_TYPE') === 'custom' && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Custom Offer IDs</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { key: '9_99', label: '9.99' },
-              { key: '19_5', label: '19.5' },
-              { key: '29_9', label: '29.9' },
-              { key: '39_99', label: '39.99' },
-              { key: '49_9', label: '49.9' },
-              { key: '59_5', label: '59.5' },
-              { key: '69_99', label: '69.99' },
-              { key: '79_9', label: '79.9' },
-              { key: '89_5', label: '89.5' },
-              { key: '99_99', label: '99.99' },
-              { key: '109_9', label: '109.9' },
-              { key: '119_5', label: '119.5' },
-            ].map(({ key, label }) => (
-              <FormField
-                key={key}
-                control={form.control}
-                name={`customOfferIds.${key}` as any}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>${label}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter offer ID"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <div className="space-y-4">
+            {fields.map((field, index) => (
+              <div
+                key={field.id}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+              >
+                {/* Price Input */}
+                <FormField
+                  control={form.control}
+                  name={`customOffers.${index}.price` as const}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price $</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter price"
+                          type="number"
+                          step="0.01"
+                          value={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : ''}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Offer ID Input */}
+                <FormField
+                  control={form.control}
+                  name={`customOffers.${index}.offerId` as const}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Offer ID</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter offer ID"
+                          type="text"
+                          value={typeof field.value === 'string' ? field.value : ''}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Remove Button */}
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => remove(index)}
+                >
+                  <Trash className="w-4 h-4" />
+                </Button>
+              </div>
             ))}
+
+            {/* Add new row button */}
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center gap-2 text-black"
+              onClick={() => append({ price: '', offerId: '' })}
+            >
+              <Plus className="w-4 h-4" /> Add Offer
+            </Button>
           </div>
         </div>
       )}
@@ -172,7 +219,6 @@ export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutCon
           Next
         </Button>
       </div>
-
     </div>
   );
 }
