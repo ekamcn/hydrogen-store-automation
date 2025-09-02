@@ -84,7 +84,7 @@ ReviewSubmitProps) {
       VITE_SQUARE_LOGO: formData.VITE_SQUARE_LOGO,
       VITE_FOOTER_COLOR: formData.VITE_FOOTER_COLOR,
       VITE_OFFER_ID_TYPE: formData.VITE_OFFER_ID_TYPE,
-      customOfferIds: formData.customOfferIds || {},
+      customOffers: formData.customOffers || {},
       VITE_DISCOVER_OUR_COLLECTIONS:
         formData.VITE_DISCOVER_OUR_COLLECTIONS || [],
     }),
@@ -127,7 +127,7 @@ ReviewSubmitProps) {
       formData.VITE_SQUARE_LOGO,
       formData.VITE_FOOTER_COLOR,
       formData.VITE_OFFER_ID_TYPE,
-      formData.customOfferIds,
+      formData.customOffers,
       formData.VITE_DISCOVER_OUR_COLLECTIONS,
     ]
   );
@@ -737,28 +737,27 @@ ReviewSubmitProps) {
             </div>
 
             {formData.VITE_OFFER_ID_TYPE === "custom" &&
-              formData.customOfferIds && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
-                    Custom Offer IDs
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {Object.entries(formData.customOfferIds).map(
-                      ([price, offerId]) => (
-                        <div
-                          key={price}
-                          className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-800 rounded"
-                        >
-                          <span className="text-sm font-medium">${price}</span>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {offerId || "Not set"}
-                          </span>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-              )}
+  formData.customOffers?.length > 0 && (
+    <div className="mt-4">
+      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+        Custom Offer IDs
+      </h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {formData.customOffers.map((offer, index) => (
+          <div
+            key={index}
+            className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-800 rounded"
+          >
+            <span className="text-sm font-medium">${offer.price}</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {offer.offerId || "Not set"}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+)}
+
           </div>
         </div>
       </div>

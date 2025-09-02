@@ -106,8 +106,14 @@ const storeFormSchema = z.object({
     })
     .optional(),
   VITE_OFFER_ID_TYPE: z.enum(["default", "custom"]),
-  customOfferIds: z.record(z.string(), z.string().optional()).optional(),
-});
+  customOffers: z
+  .array(
+    z.object({
+      price: z.string().min(1, "Price is required"),
+      offerId: z.string().min(1, "Offer ID is required"),
+    })
+  )
+  .optional()});
 
 // Define the form data type
 export type StoreFormData = z.infer<typeof storeFormSchema>;
@@ -162,20 +168,7 @@ const initialFormData: Partial<StoreFormData> = {
   VITE_CHECKOUT_ID: "",
   VITE_SQUARE_LOGO: undefined,
   VITE_OFFER_ID_TYPE: "default" as const,
-  customOfferIds: {
-    "9_99": "",
-    "19_5": "",
-    "29_9": "",
-    "39_99": "",
-    "49_9": "",
-    "59_5": "",
-    "69_99": "",
-    "79_9": "",
-    "89_5": "",
-    "99_99": "",
-    "109_9": "",
-    "119_5": "",
-  },
+  customOffers: [],
 };
 
 // Define the steps
@@ -312,7 +305,7 @@ export default function StoreCreatorForm() {
         "VITE_LOGO",
         "VITE_BANNER",
         "VITE_SQUARE_LOGO",
-        "customOfferIds",
+        "customOffers",
       ];
 
       // For required fields, check if they have values
@@ -407,7 +400,7 @@ export default function StoreCreatorForm() {
           "VITE_CHECKOUT_ID",
           "VITE_SQUARE_LOGO",
           "VITE_OFFER_ID_TYPE",
-          "customOfferIds",
+          "customOffers",
         ];
       default:
         return [];

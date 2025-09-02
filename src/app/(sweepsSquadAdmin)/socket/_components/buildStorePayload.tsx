@@ -19,7 +19,7 @@ interface StorePayload {
   VITE_CHECKOUT_ID?: string;
   VITE_SQUARE_LOGO?: string;
   VITE_OFFER_ID_TYPE?: string;
-  customOfferIds?: Record<string, string>;
+  customOffers?: Record<string, string>;
   VITE_COMPANY_BUSINESS_NUMBER?: string;
   VITE_POLICY_UPDATED_AT?: string;
   VITE_TERMS_OF_SERVICE_UPDATE_AT?: string;
@@ -62,7 +62,7 @@ interface StoreData {
   checkoutId?: string;
   squareLogo?: string;
   offerIdType?: string;
-  customOfferIds?: Record<string, string>;
+  customOffers?: Record<string, string>;
   companyBusinessNumber?: string;
   policyUpdatedAt?: string;
   termsOfServiceUpdateAt?: string;
@@ -113,7 +113,7 @@ export function buildStorePayload(
     checkoutId: source.VITE_CHECKOUT_ID,
     squareLogo: source.VITE_SQUARE_LOGO,
     offerIdType: source.VITE_OFFER_ID_TYPE,
-    customOfferIds: source.customOfferIds,
+    customOffers: source.customOffers,
     companyBusinessNumber: source.VITE_COMPANY_BUSINESS_NUMBER,
     policyUpdatedAt: source.VITE_POLICY_UPDATED_AT,
     termsOfServiceUpdateAt: source.VITE_TERMS_OF_SERVICE_UPDATE_AT,

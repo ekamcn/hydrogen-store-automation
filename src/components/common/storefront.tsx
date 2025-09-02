@@ -41,7 +41,7 @@ interface StoreData {
   checkoutId?: string;
   squareLogo?: string | { base64: string; fileName: string };
   offerIdType?: string;
-  customOfferIds?: Record<string, string | undefined>;
+  customOffers?: Record<string, string | undefined>;
   discoverOurCollections?: string[];
   companyBusinessNumber?: string;
   policyUpdatedAt?: string;
@@ -180,7 +180,7 @@ export function buildStorePayload(source: Partial<StorePayload>): {
     checkoutId: source.VITE_CHECKOUT_ID,
     squareLogo: source.VITE_SQUARE_LOGO,
     offerIdType: source.VITE_OFFER_ID_TYPE,
-    customOfferIds: source.customOfferIds,
+    customOffers: source.customOffers,
     discoverOurCollections: Array.isArray(source.VITE_DISCOVER_OUR_COLLECTIONS)
       ? source.VITE_DISCOVER_OUR_COLLECTIONS
       : undefined,
