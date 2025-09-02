@@ -86,7 +86,6 @@ export default function CsvCollectionPage() {
     successful: 0,
     failed: 0,
   });
-  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
   // Fetch publications on component mount
   useEffect(() => {
@@ -200,11 +199,7 @@ export default function CsvCollectionPage() {
   };
 
   const processCSV = async () => {
-    // Validate input
-    if (!selectedStore) {
-      setError("Please select a store (theme) before proceeding.");
-      return;
-    }
+
     if (!file) {
       setError("Please upload a CSV file");
       return;

@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 }[]) {
       let groupedMedia: { handle: any; media: any[]; }[] = [];
       let currentHandle: string | null = null;
-      let currentMediaGroup: { originalSource: any; alt: any; contentType: string; }[] = [];
+      let currentMediaGroup: { originalSource: any; alt: any; contentType: string; filename?: string; }[] = [];
 
       // 🧩 Group media by Handle
       parsedCsvData.forEach((row: { [x: string]: string; }, index: number) => {
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
               metafields: [{
                 namespace: 'custom',
                 key: 'theme_types',
-                value: publications[0]?.publicationName.split(' ').join('-'),
+                value: publications.map((publication: { publicationName: string; }) => publication.publicationName.split(' ').join('-')).join(','),
                 type: 'single_line_text_field'
               }],
               variants: [
@@ -142,12 +142,12 @@ export async function POST(request: NextRequest) {
                 },
               ],
               // Add media property, will be set below if matchedMediaGroup exists
-              media: [] as { originalSource: string; alt: string; contentType: string }[],
+              files: [] as { originalSource: string; alt: string; contentType: string }[],
             },
           };
 
           if (matchedMediaGroup) {
-            inputPayload.productSet.media = matchedMediaGroup.media;
+            inputPayload.productSet.files = matchedMediaGroup.media;
           }
 
           // 🛠️ Create product
@@ -206,17 +206,16 @@ export async function POST(request: NextRequest) {
 
           const productData = await createProductResponse.json();
           const createdProduct = productData?.data?.productSet?.product;
-          const inventoryItemId = productData.data.productSet.product.variants.edges[0].node.inventoryItem.id;
-
+          const inventoryItemId = productData?.data?.productSet?.product?.variants?.edges[0]?.node?.inventoryItem?.id;
           if (!createdProduct?.id) {
             console.error(
               "Product creation failed:",
-              productData.data.productCreate.userErrors
+              productData?.data?.productCreate?.userErrors
             );
             continue;
           }
 
-          const productId = createdProduct.id;
+          const productId = createdProduct?.id;
 
           const updateItemMutation = `mutation inventoryItemUpdate($id: ID!, $input: InventoryItemInput!) {
       inventoryItemUpdate(id: $id, input: $input) {
