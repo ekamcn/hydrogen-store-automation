@@ -293,8 +293,7 @@ export default function ProductUploader() {
                   )}
                 </Button>
               </div>
-{/* 
-              {isUploading && (
+{/* {isUploading && (
                 <div className="space-y-2">
                   <Progress value={uploadProgress} className="w-full" />
                   <p className="text-sm text-gray-600 text-center">

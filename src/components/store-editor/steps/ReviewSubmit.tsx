@@ -65,7 +65,7 @@ export default function   ReviewSubmit({
     VITE_CHECKOUT_ID: formData.VITE_CHECKOUT_ID,
     VITE_SQUARE_LOGO: formData.VITE_SQUARE_LOGO,
     VITE_OFFER_ID_TYPE: formData.VITE_OFFER_ID_TYPE,
-    customOfferIds: formData.customOfferIds || {},
+    customOffers: formData.customOffers || {},
   }), [
     formData.VITE_STORE_NAME,
     formData.VITE_CUSTOMER_SUPPORT_EMAIL,
@@ -87,7 +87,7 @@ export default function   ReviewSubmit({
     formData.VITE_CHECKOUT_ID,
     formData.VITE_SQUARE_LOGO,
     formData.VITE_OFFER_ID_TYPE,
-    formData.customOfferIds,
+    formData.customOffers,
   ]);
   
   // Use useEffect to set payload when it changes
