@@ -18,6 +18,7 @@ interface Store {
   store_id: string;
   storeName: string;
   storeUrl: string;
+  shopifyUrl: string;
   status: string;
   email: string;
   phone: string;
@@ -113,6 +114,9 @@ export default function CustomersTable() {
                     Theme Status
                   </TableHead>
                   <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
+                    Admin Store URL
+                  </TableHead>
+                  <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
                     Store URL
                   </TableHead>
                   <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
@@ -158,6 +162,16 @@ export default function CustomersTable() {
                         >
                           {customer.status}
                         </span>
+                      </TableCell>
+                      <TableCell className="px-3 sm:px-4 py-2 sm:py-3 text-sm">
+                        <a
+                          href={customer.shopifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline break-all"
+                        >
+                          {customer.shopifyUrl}
+                        </a>
                       </TableCell>
                       <TableCell className="px-3 sm:px-4 py-2 sm:py-3 text-sm">
                         <a
