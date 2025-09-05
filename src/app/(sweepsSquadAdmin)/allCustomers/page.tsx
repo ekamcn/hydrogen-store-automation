@@ -1,8 +1,13 @@
-
-
 "use client";
 import {
-  Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useRef, useState } from "react";
@@ -36,9 +41,10 @@ export default function CustomersTable() {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const serverUrl = `http://192.168.29.92:1000`;
+    const serverUrl = `http://51.112.151.1`;
     socketRef.current = io(serverUrl, {
       transports: ["websocket", "polling"],
+      path: "/backend/socket.io",
       forceNew: true,
       reconnection: true,
       reconnectionAttempts: 5,
@@ -61,14 +67,20 @@ export default function CustomersTable() {
         setLoading(false);
       })
       .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred"
+        );
         setLoading(false);
       });
   }, []);
 
   // Handler for Publish button
   const handlePublish = (customer: Store) => {
-    router.push(`/publishCollection?storeName=${encodeURIComponent(customer.storeName)}&storeId=${encodeURIComponent(customer.store_id)}`);
+    router.push(
+      `/publishCollection?storeName=${encodeURIComponent(
+        customer.storeName
+      )}&storeId=${encodeURIComponent(customer.store_id)}`
+    );
   };
 
   return (
@@ -120,9 +132,11 @@ export default function CustomersTable() {
                   </TableRow>
                 ) : (
                   stores.map((customer, idx) => (
-                    <TableRow 
-                      key={customer.store_id} 
-                      className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-indigo-50 transition-colors`}
+                    <TableRow
+                      key={customer.store_id}
+                      className={`${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-indigo-50 transition-colors`}
                     >
                       <TableCell className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 font-medium text-center text-sm">
                         {idx + 1}
@@ -170,9 +184,16 @@ export default function CustomersTable() {
                           <Button
                             onClick={async () => {
                               try {
-                                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/store/env?storeName=${encodeURIComponent(customer.storeName)}`, {
-                                  method: 'GET',
-                                });
+                                await fetch(
+                                  `${
+                                    process.env.NEXT_PUBLIC_BACKEND_URL
+                                  }/store/env?storeName=${encodeURIComponent(
+                                    customer.storeName
+                                  )}`,
+                                  {
+                                    method: "GET",
+                                  }
+                                );
                               } catch {
                                 // ignore
                               } finally {

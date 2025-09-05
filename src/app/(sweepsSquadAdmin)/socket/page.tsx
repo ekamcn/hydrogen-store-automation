@@ -150,9 +150,7 @@ export default function StoreCreator() {
   };
 
   useEffect(() => {
-    // const serverUrl = "${process.env.NEXT_PUBLIC_BACKEND_URL}";
     const serverUrl = `http://51.112.151.1`;
-
     socketRef.current = io(serverUrl, {
       transports: ["websocket", "polling"],
       path: "/backend/socket.io",
