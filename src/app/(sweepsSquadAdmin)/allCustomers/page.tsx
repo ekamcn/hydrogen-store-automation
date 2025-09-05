@@ -18,12 +18,13 @@ interface Store {
   store_id: string;
   storeName: string;
   storeUrl: string;
+  shopifyUrl: string;
   status: string;
   email: string;
   phone: string;
   created_at: string;
   updated_at: string;
-  isPublished: boolean; // Added isPublished to the interface
+  isPublished: boolean;
 }
 type StoresResponse = { stores: Store[] };
 function isStoresResponse(value: unknown): value is StoresResponse {
@@ -41,10 +42,10 @@ export default function CustomersTable() {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const serverUrl = `http://51.112.151.1`;
+    const serverUrl = `http://192.168.29.92:1000`;
     socketRef.current = io(serverUrl, {
       transports: ["websocket", "polling"],
-      path: "/backend/socket.io",
+      // path: "/backend/socket.io",
       forceNew: true,
       reconnection: true,
       reconnectionAttempts: 5,
@@ -113,6 +114,9 @@ export default function CustomersTable() {
                     Theme Status
                   </TableHead>
                   <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
+                    Admin Store URL
+                  </TableHead>
+                  <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
                     Store URL
                   </TableHead>
                   <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
@@ -158,6 +162,16 @@ export default function CustomersTable() {
                         >
                           {customer.status}
                         </span>
+                      </TableCell>
+                      <TableCell className="px-3 sm:px-4 py-2 sm:py-3 text-sm">
+                        <a
+                          href={customer.shopifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline break-all"
+                        >
+                          {customer.shopifyUrl}
+                        </a>
                       </TableCell>
                       <TableCell className="px-3 sm:px-4 py-2 sm:py-3 text-sm">
                         <a
@@ -212,11 +226,11 @@ export default function CustomersTable() {
                           </Button>
                           <Button
                             onClick={() => handlePublish(customer)}
-                            disabled={loading || customer.isPublished} // Updated to include isPublished
+                            disabled={loading || customer.isPublished}
                             variant="default"
                             className="bg-blue-600 cursor-pointer text-white w-full sm:w-auto"
                           >
-                            Publish
+                            {customer.isPublished ? "Published" : "Publish"}
                           </Button>
                         </div>
                       </TableCell>
