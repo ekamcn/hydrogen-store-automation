@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 import { Button } from "@/components/ui/button";
 import { io, Socket } from "socket.io-client";
 import { useStoreContext } from "@/utils/storeContext";
@@ -119,6 +120,7 @@ export default function StoreCreator() {
   const [logoBase64, setLogoBase64] = useState<string>("");
 
   const socketRef = useRef<Socket | null>(null);
+  const router = useRouter(); // Initialize router for navigation
 
   // Handle file input change
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -134,6 +136,7 @@ export default function StoreCreator() {
       }
     }
   };
+
 
   // Add message to the list with unique ID generator
   const messageIdRef = useRef(0);
@@ -198,7 +201,7 @@ export default function StoreCreator() {
       console.log("Received shopify:authurl:", data);
       addMessage(
         "shopify:authurl",
-        `🔗 Auth URL Generated: ${data.authUrl || "N/A"}`,
+        `🔗 Auth URL Generated: ${data.authUrl || shopifyStatus.storeUrl}`,
         data
       );
       setShopifyStatus((prev) => ({ ...prev, authUrl: data.authUrl }));
@@ -235,6 +238,26 @@ export default function StoreCreator() {
         data
       );
       setShopifyStatus((prev) => ({ ...prev, isProcessing: false }));
+
+      // Redirect to /publishCollection with storeName and storeId
+      const storeName = data.storeName || contextPayload.VITE_STORE_NAME;
+      const storeId = data.storeId || contextPayload.VITE_CHECKOUT_ID;
+      if (storeName && storeId) {
+        router.push(
+          `/publishCollection?storeName=${encodeURIComponent(
+            storeName
+          )}&storeId=${encodeURIComponent(storeId)}`
+        );
+      } else {
+        console.error(
+          "Cannot redirect to /publishCollection: Missing storeName or storeId",
+          { storeName, storeId }
+        );
+        addMessage(
+          "error",
+          "Failed to redirect to publish collections: Missing store information"
+        );
+      }
     });
 
     socket.on("shopify:storeurl", (data) => {
@@ -257,7 +280,7 @@ export default function StoreCreator() {
         socketRef.current.disconnect();
       }
     };
-  }, []);
+  }, [contextPayload, router]); // Add router to dependencies
 
   const createShopifyStore = () => {
     if (socketRef.current && socketRef.current.connected) {
@@ -272,6 +295,7 @@ export default function StoreCreator() {
       addMessage("error", "Cannot create store - Socket.IO not connected");
     }
   };
+
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -336,6 +360,10 @@ export default function StoreCreator() {
             </span>
           </div>
         </div>
+      </div>
+
+      <div>
+        Auth URL : {shopifyStatus?.authUrl}
       </div>
 
       {/* Socket.IO Status */}
