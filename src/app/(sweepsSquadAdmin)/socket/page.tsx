@@ -363,7 +363,7 @@ export default function StoreCreator() {
       </div>
 
       <div>
-        Auth URL : {shopifyStatus?.authUrl}
+        {/* Auth URL : {shopifyStatus?.authUrl} */}
       </div>
 
       {/* Socket.IO Status */}

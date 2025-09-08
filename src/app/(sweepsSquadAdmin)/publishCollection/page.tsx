@@ -516,13 +516,13 @@ export default function CsvPublishPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Publish Progress</h1>
-      {/* {generalError && <ErrorMessage message={generalError} className="mb-4" />} */}
+      {generalError && <ErrorMessage message={generalError} className="mb-4" />}
       {generalSuccess && <SuccessMessage message={generalSuccess} className="mb-4" />}
 
       {/* Collections Section */}
       <h2 className="text-2xl font-semibold mb-4">Collections</h2>
       {collectionStatus && <div className="mb-4 text-blue-700">{collectionStatus}</div>}
-      {/* {collectionError && <ErrorMessage message={collectionError} className="mb-4" />} */}
+      {collectionError && <ErrorMessage message={collectionError} className="mb-4" />}
       {collectionSuccess && <SuccessMessage message={collectionSuccess} className="mb-4" />}
       {collectionProcessingStatus.total > 0 && (
         <Card className="p-4 mb-6 bg-blue-50 border-blue-300">
@@ -536,10 +536,10 @@ export default function CsvPublishPage() {
               <p className="text-sm text-gray-600">Successful</p>
               <p className="text-xl font-medium">{collectionProcessingStatus.successful}</p>
             </div>
-            {/* <div>
+            <div>
               <p className="text-sm text-gray-600">Failed</p>
               <p className="text-xl font-medium">{collectionProcessingStatus.failed}</p>
-            </div> */}
+            </div>
           </div>
           <div className="mt-3 w-full bg-gray-200 rounded-full h-2.5">
             <div
@@ -553,7 +553,7 @@ export default function CsvPublishPage() {
               }}
             ></div>
           </div>
-          {/* {(failedCollectionRecords.length > 0 || successfulCollectionRecords.length > 0) && (
+          {(failedCollectionRecords.length > 0 || successfulCollectionRecords.length > 0) && (
             <div className="mt-4">
               {failedCollectionRecords.length > 0 && (
                 <Button
@@ -577,7 +577,7 @@ export default function CsvPublishPage() {
                 Download records to review.
               </p>
             </div>
-          )} */}
+          )}
         </Card>
       )}
       {successfulCollectionRecords.length > 0 && (
@@ -620,7 +620,7 @@ export default function CsvPublishPage() {
           </div>
         </Card>
       )}
-      {/* {failedCollectionRecords.length > 0 && (
+      {failedCollectionRecords.length > 0 && (
         <Card className="p-6 mb-6 border-red-200 bg-red-50">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-red-800">
@@ -665,12 +665,12 @@ export default function CsvPublishPage() {
             )}
           </div>
         </Card>
-      )} */}
+      )}
 
       {/* Products Section */}
       <h2 className="text-2xl font-semibold mb-4">Products</h2>
       {productStatus && <div className="mb-4 text-blue-700">{productStatus}</div>}
-      {/* {productError && <ErrorMessage message={productError} className="mb-4" />} */}
+      {productError && <ErrorMessage message={productError} className="mb-4" />}
       {productSuccess && <SuccessMessage message={productSuccess} className="mb-4" />}
       {productProcessingStatus.total > 0 && (
         <Card className="p-4 mb-6 bg-blue-50 border-blue-300">
@@ -684,10 +684,10 @@ export default function CsvPublishPage() {
               <p className="text-sm text-gray-600">Successful</p>
               <p className="text-xl font-medium">{productProcessingStatus.successful}</p>
             </div>
-            {/* <div>
+            <div>
               <p className="text-sm text-gray-600">Failed</p>
               <p className="text-xl font-medium">{productProcessingStatus.failed}</p>
-            </div> */}
+            </div>
           </div>
           <div className="mt-3 w-full bg-gray-200 rounded-full h-2.5">
             <div
@@ -701,7 +701,7 @@ export default function CsvPublishPage() {
               }}
             ></div>
           </div>
-          {/* {(failedProductRecords.length > 0 || successfulProductRecords.length > 0) && (
+          {(failedProductRecords.length > 0 || successfulProductRecords.length > 0) && (
             <div className="mt-4">
               {failedProductRecords.length > 0 && (
                 <Button
@@ -725,7 +725,7 @@ export default function CsvPublishPage() {
                 Download records to review.
               </p>
             </div>
-          )} */}
+          )}
         </Card>
       )}
       {successfulProductRecords.length > 0 && (
@@ -768,7 +768,7 @@ export default function CsvPublishPage() {
           </div>
         </Card>
       )}
-      {/* {failedProductRecords.length > 0 && (
+      {failedProductRecords.length > 0 && (
         <Card className="p-6 mb-6 border-red-200 bg-red-50">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-red-800">
@@ -813,7 +813,7 @@ export default function CsvPublishPage() {
             )}
           </div>
         </Card>
-      )} */}
+      )}
     </div>
   );
 }
