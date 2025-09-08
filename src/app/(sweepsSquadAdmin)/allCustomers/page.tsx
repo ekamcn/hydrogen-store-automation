@@ -224,14 +224,14 @@ export default function CustomersTable() {
                           >
                             Edit
                           </Button>
-                          <Button
+                          {/* <Button
                             onClick={() => handlePublish(customer)}
                             disabled={loading || customer.isPublished}
                             variant="default"
                             className="bg-blue-600 cursor-pointer text-white w-full sm:w-auto"
                           >
                             {customer.isPublished ? "Published" : "Publish"}
-                          </Button>
+                          </Button> */}
                         </div>
                       </TableCell>
                     </TableRow>
