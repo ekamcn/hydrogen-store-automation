@@ -71,6 +71,21 @@ export default function LegalInformation({
                 </FormItem>
               )}
             />
+              <FormField
+              control={form.control}
+              name="VITE_COMPANY_CITY"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>
+                    Company City <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Paris" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <FormField
@@ -95,7 +110,7 @@ export default function LegalInformation({
         </div>
       </section>
 
-      <section id="policy-information" className="space-y-4">
+      {/* <section id="policy-information" className="space-y-4">
         <div>
           <p className="text-md mb-2 font-semibold">Policy Information</p>
           <Separator />
@@ -374,7 +389,7 @@ export default function LegalInformation({
             />
           </div>
         </section>
-      </section>
+      </section> */}
 
       <div className="flex justify-between">
         <Button

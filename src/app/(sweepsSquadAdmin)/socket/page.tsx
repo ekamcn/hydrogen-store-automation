@@ -27,6 +27,7 @@ interface StorePayload {
   VITE_TYPOGRAPHY?: string;
   VITE_COMPANY_NAME?: string;
   VITE_COMPANY_ADDRESS?: string;
+  VITE_COMPANY_CITY?: string;
   VITE_CHECKOUT_DOMAIN?: string;
   VITE_CHECKOUT_ID?: string;
   VITE_SQUARE_LOGO?: { base64: string; fileName: string };
@@ -58,6 +59,7 @@ interface StoreData {
   typography?: string;
   companyName?: string;
   companyAddress?: string;
+  companyCity?: string;
   checkoutDomain?: string;
   checkoutId?: string;
   squareLogo?: string | { base64: string; fileName: string };

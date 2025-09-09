@@ -64,6 +64,7 @@ ReviewSubmitProps) {
       VITE_TYPOGRAPHY: formData.VITE_TYPOGRAPHY,
       VITE_COMPANY_NAME: formData.VITE_COMPANY_NAME,
       VITE_COMPANY_ADDRESS: formData.VITE_COMPANY_ADDRESS,
+      VITE_COMPANY_CITY: formData.VITE_COMPANY_CITY,
       VITE_COMPANY_BUSINESS_NUMBER: formData.VITE_COMPANY_BUSINESS_NUMBER,
       VITE_POLICY_UPDATED_AT: formData.VITE_POLICY_UPDATED_AT,
       VITE_BUSINESS_HOURS: formData.VITE_BUSINESS_HOURS,
@@ -107,6 +108,7 @@ ReviewSubmitProps) {
       formData.VITE_TYPOGRAPHY,
       formData.VITE_COMPANY_NAME,
       formData.VITE_COMPANY_ADDRESS,
+      formData.VITE_COMPANY_CITY,
       formData.VITE_COMPANY_BUSINESS_NUMBER,
       formData.VITE_POLICY_UPDATED_AT,
       formData.VITE_TERMS_OF_SERVICE_UPDATE_AT,
@@ -552,6 +554,14 @@ ReviewSubmitProps) {
                 </div>
                 <div>
                   <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Company City
+                  </h5>
+                  <p className="mt-1">
+                    {formData.VITE_COMPANY_CITY || "Not specified"}
+                  </p>
+                </div>
+                {/* <div>
+                  <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Business Hours
                   </h5>
                   <p className="mt-1">
@@ -573,12 +583,12 @@ ReviewSubmitProps) {
                   <p className="mt-1">
                     {formData.VITE_POLICY_UPDATED_AT || "Not specified"}
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
 
             {/* Refund Policy */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Refund Policy
               </h4>
@@ -616,10 +626,10 @@ ReviewSubmitProps) {
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Shipping & Delivery */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Shipping & Delivery
               </h4>
@@ -673,7 +683,7 @@ ReviewSubmitProps) {
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -737,27 +747,28 @@ ReviewSubmitProps) {
             </div>
 
             {formData.VITE_OFFER_ID_TYPE === "custom" &&
-  formData.customOffers?.length > 0 && (
-    <div className="mt-4">
-      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
-        Custom Offer IDs
-      </h4>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {formData.customOffers.map((offer, index) => (
-          <div
-            key={index}
-            className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-800 rounded"
-          >
-            <span className="text-sm font-medium">${offer.price}</span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              {offer.offerId || "Not set"}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-)}
-
+              formData.customOffers?.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                    Custom Offer IDs
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {formData.customOffers.map((offer, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-800 rounded"
+                      >
+                        <span className="text-sm font-medium">
+                          ${offer.price}
+                        </span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {offer.offerId || "Not set"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       </div>

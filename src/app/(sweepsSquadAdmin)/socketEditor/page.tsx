@@ -20,6 +20,7 @@ interface StorePayload {
   VITE_SHOPIFY_URL?: string;
   VITE_COMPANY_NAME?: string;
   VITE_COMPANY_ADDRESS?: string;
+  VITE_COMPANY_CITY?: string;
   VITE_SIREN_NUMBER?: string;
   VITE_PP_LAST_UPDATED_DATE?: string;
   VITE_BUSINESS_HOURS?: string;
@@ -49,6 +50,7 @@ interface StoreData {
   shopifyUrl?: string;
   companyName?: string;
   companyAddress?: string;
+  companyCity?: string;
   companyBusinessNumber?: string;
   policyUpdatedAt?: string;
   businessHours?: string;
