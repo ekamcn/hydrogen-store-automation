@@ -201,10 +201,10 @@ export default function StoreCreator() {
       console.log("Received shopify:authurl:", data);
       addMessage(
         "shopify:authurl",
-        `🔗 Auth URL Generated: ${data.authUrl || shopifyStatus.storeUrl}`,
+        `🔗 Auth URL Generated: ${data || shopifyStatus.storeUrl}`,
         data
       );
-      setShopifyStatus((prev) => ({ ...prev, authUrl: data.authUrl }));
+      setShopifyStatus((prev) => ({ ...prev, authUrl: data }));
       if (typeof data === "string" && data.startsWith("http")) {
         window.open(data, "_blank");
       }
