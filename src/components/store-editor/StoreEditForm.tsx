@@ -33,6 +33,7 @@ const storeEditorFormSchema = z.object({
   VITE_SHOPIFY_URL: z.string().min(1, "Shopify Store URL is required"),
   VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
   VITE_COMPANY_ADDRESS: z.string().min(1, "Company address is required"),
+  VITE_COMPANY_CITY: z.string().min(1, "Company city is required"),
   VITE_SIREN_NUMBER: z
     .string()
     .min(1, "Company business registration number / SIREN is required"),
@@ -72,6 +73,7 @@ const initialFormData: Partial<StoreEditorFormData> = {
   VITE_SHOPIFY_URL: "",
   VITE_COMPANY_NAME: "",
   VITE_COMPANY_ADDRESS: "",
+  VITE_COMPANY_CITY: "",
   VITE_SIREN_NUMBER: "",
   VITE_PP_LAST_UPDATED_DATE: "",
   VITE_BUSINESS_HOURS: "",
@@ -108,6 +110,7 @@ type EnvResponse = {
     shopifyAdminToken?: string;
     companyName?: string;
     companyAddress?: string;
+    companyCity?: string;
     companyBusinessNumber?: string;
     policyUpdatedAt?: string;
     businessHours?: string;
@@ -139,6 +142,7 @@ function buildUpdatePayload(values: StoreEditorFormData) {
     shopifyAdminToken: values.VITE_SHOPIFY_ADMIN_ACCESS_TOKEN,
     companyName: values.VITE_COMPANY_NAME,
     companyAddress: values.VITE_COMPANY_ADDRESS,
+    companyCity: values.VITE_COMPANY_CITY,
     companyBusinessNumber: values.VITE_SIREN_NUMBER,
     policyUpdatedAt: values.VITE_PP_LAST_UPDATED_DATE,
     businessHours: values.VITE_BUSINESS_HOURS,
@@ -262,6 +266,7 @@ export default function StoreEditorForm() {
           VITE_SHOPIFY_URL: d.shopifyUrl || "",
           VITE_COMPANY_NAME: d.companyName || "",
           VITE_COMPANY_ADDRESS: d.companyAddress || "",
+          VITE_COMPANY_CITY: d.companyCity || "",
           VITE_SIREN_NUMBER: d.companyBusinessNumber || "",
           VITE_PP_LAST_UPDATED_DATE: d.policyUpdatedAt || "",
           VITE_TC_LAST_UPDATED_DATE: d.termsOfServiceUpdateAt || "",
@@ -378,6 +383,7 @@ export default function StoreEditorForm() {
         return [
           "VITE_COMPANY_NAME",
           "VITE_COMPANY_ADDRESS",
+          "VITE_COMPANY_CITY",
           "VITE_SIREN_NUMBER",
           "VITE_PP_LAST_UPDATED_DATE",
           "VITE_TC_LAST_UPDATED_DATE",

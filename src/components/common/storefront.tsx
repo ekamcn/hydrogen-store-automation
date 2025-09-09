@@ -37,6 +37,7 @@ interface StoreData {
   typography?: string;
   companyName?: string;
   companyAddress?: string;
+  companyCity?: string;
   checkoutDomain?: string;
   checkoutId?: string;
   squareLogo?: string | { base64: string; fileName: string };
@@ -176,6 +177,7 @@ export function buildStorePayload(source: Partial<StorePayload>): {
     typography: source.VITE_TYPOGRAPHY,
     companyName: source.VITE_COMPANY_NAME,
     companyAddress: source.VITE_COMPANY_ADDRESS,
+    companyCity: source.VITE_COMPANY_CITY,
     checkoutDomain: source.VITE_CHECKOUT_DOMAIN,
     checkoutId: source.VITE_CHECKOUT_ID,
     squareLogo: source.VITE_SQUARE_LOGO,
