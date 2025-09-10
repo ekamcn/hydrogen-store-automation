@@ -73,7 +73,9 @@ export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutCon
           name="VITE_SQUARE_LOGO"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Square Logo</FormLabel>
+              <FormLabel>
+                Square Logo <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="file"
@@ -222,3 +224,4 @@ export default function CheckoutConfig({ form, nextStep, prevStep }: CheckoutCon
     </div>
   );
 }
+
