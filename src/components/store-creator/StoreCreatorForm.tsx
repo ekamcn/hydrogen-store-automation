@@ -1,5 +1,5 @@
 "use client";
-
+ 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import LegalInformation from "./steps/LegalInformation";
 import CheckoutConfig from "./steps/CheckoutConfig";
 import ReviewSubmit from "./steps/ReviewSubmit";
 import StepIndicator from "./StepIndicator";
-
+ 
 // Define the Zod schema for form validation
 const storeFormSchema = z.object({
   // Store Basics helper
@@ -34,35 +34,41 @@ const storeFormSchema = z.object({
     .min(1, "Shopify Admin Access Token is required"),
   VITE_SHOPIFY_URL: z.string().min(1, "Shopify Store URL is required"),
   VITE_DISCOVER_OUR_COLLECTIONS: z.array(z.string().min(1)).optional(),
-
+ 
   // Theme Selection
   VITE_CATEGORY: z.enum(["diy", "pets", "deco", "baby", "automoto", "general"]),
   VITE_LANGUAGE: z.enum(["en", "fr"]),
-
+ 
   // Brand Customization
   VITE_COLOR1: z.string().min(1, "Primary color is required"),
   VITE_FOOTER_COLOR: z.string().min(1, "Email color is required"),
   VITE_COLOR2: z.string().min(1, "Secondary color is required"),
   VITE_LOGO: z
     .object({
-      base64: z.string(),
-      fileName: z.string(),
+      base64: z.string().min(1, "Logo is required"),
+      fileName: z.string().min(1, "Logo file name is required"),
     })
-    .optional(),
+    .refine((data) => data && data.base64 && data.fileName, {
+      message: "Logo is required",
+    }),
   VITE_BANNER: z
     .object({
-      base64: z.string(),
-      fileName: z.string(),
+      base64: z.string().min(1, "Banner is required"),
+      fileName: z.string().min(1, "Banner file name is required"),
     })
-    .optional(),
+    .refine((data) => data && data.base64 && data.fileName, {
+      message: "Banner is required",
+    }),
   VITE_MOBILE_BANNER: z
     .object({
-      base64: z.string(),
-      fileName: z.string(),
+      base64: z.string().min(1, "Mobile banner is required"),
+      fileName: z.string().min(1, "Mobile banner file name is required"),
     })
-    .optional(),
+    .refine((data) => data && data.base64 && data.fileName, {
+      message: "Mobile banner is required",
+    }),
   VITE_TYPOGRAPHY: z.enum(["sans-serif", "serif", "monospace"]),
-
+ 
   // Legal Information
   VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
   VITE_COMPANY_ADDRESS: z.string().min(1, "Company address is required"),
@@ -96,16 +102,18 @@ const storeFormSchema = z.object({
     .string()
     .min(1, "Return shipping policy is required"),
   VITE_SALE_ITEMS_POLICY: z.string().min(1, "Sale items policy is required"),
-
+ 
   // Checkout Configuration
   VITE_CHECKOUT_DOMAIN: z.string().min(1, "Checkout domain is required"),
   VITE_CHECKOUT_ID: z.string().min(1, "Checkout ID is required"),
   VITE_SQUARE_LOGO: z
     .object({
-      base64: z.string(),
-      fileName: z.string(),
+      base64: z.string().min(1, "Square logo is required"),
+      fileName: z.string().min(1, "Square logo file name is required"),
     })
-    .optional(),
+    .refine((data) => data && data.base64 && data.fileName, {
+      message: "Square logo is required",
+    }),
   VITE_OFFER_ID_TYPE: z.enum(["default", "custom"]),
   customOffers: z
   .array(
@@ -115,10 +123,10 @@ const storeFormSchema = z.object({
     })
   )
   .optional()});
-
+ 
 // Define the form data type
 export type StoreFormData = z.infer<typeof storeFormSchema>;
-
+ 
 // Initial form data
 const initialFormData: Partial<StoreFormData> = {
   // Store Basics
@@ -131,11 +139,11 @@ const initialFormData: Partial<StoreFormData> = {
   VITE_SHOPIFY_ADMIN_ACCESS_TOKEN: "",
   VITE_SHOPIFY_URL: "",
   VITE_DISCOVER_OUR_COLLECTIONS: [],
-
+ 
   // Theme Selection
   VITE_CATEGORY: "general" as const,
   VITE_LANGUAGE: "en" as const,
-
+ 
   // Brand Customization
   VITE_COLOR1: "#000000",
   VITE_COLOR2: "#ffffff",
@@ -144,7 +152,7 @@ const initialFormData: Partial<StoreFormData> = {
   VITE_BANNER: undefined,
   VITE_MOBILE_BANNER: undefined,
   VITE_TYPOGRAPHY: "sans-serif" as const,
-
+ 
   // Legal Information
   VITE_COMPANY_NAME: "",
   VITE_COMPANY_ADDRESS: "",
@@ -164,7 +172,7 @@ const initialFormData: Partial<StoreFormData> = {
   // VITE_WITHDRAWAL_PERIOD: "",
   // VITE_RETURN_SHIPPING_POLICY: "",
   // VITE_SALE_ITEMS_POLICY: "",
-
+ 
   // Checkout Configuration
   VITE_CHECKOUT_DOMAIN: "",
   VITE_CHECKOUT_ID: "",
@@ -172,7 +180,7 @@ const initialFormData: Partial<StoreFormData> = {
   VITE_OFFER_ID_TYPE: "default" as const,
   customOffers: [],
 };
-
+ 
 // Define the steps
 const steps = [
   { id: "basics", name: "Store Basics" },
@@ -182,7 +190,7 @@ const steps = [
   { id: "checkout", name: "Checkout Configuration" },
   { id: "review", name: "Review & Submit" },
 ];
-
+ 
 export default function StoreCreatorForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -205,16 +213,16 @@ export default function StoreCreatorForm() {
     false,
     false,
   ]);
-
+ 
   // Initialize React Hook Form
   const form = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
     defaultValues: initialFormData,
     mode: "onChange",
   });
-
+ 
   const { trigger, getValues, formState, watch } = form;
-
+ 
   // Watch form changes to update validation status
   useEffect(() => {
     const subscription = watch(() => {
@@ -223,32 +231,32 @@ export default function StoreCreatorForm() {
     return () => subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch]);
-
+ 
   // Initial validation check
   useEffect(() => {
     updateValidationStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+ 
   // Navigate to next step with validation
   const nextStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep);
     const isValid = await trigger(fieldsToValidate);
-
+ 
     // Mark current step as completed
     const newCompletionStatus = [...stepCompletionStatus];
     newCompletionStatus[currentStep] = true;
     setStepCompletionStatus(newCompletionStatus);
-
+ 
     if (isValid && currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     }
-
+ 
     // Update validation status
     setTimeout(() => updateValidationStatus(), 100);
   };
-
+ 
   // Navigate to previous step
   const prevStep = () => {
     if (currentStep > 0) {
@@ -256,15 +264,15 @@ export default function StoreCreatorForm() {
       window.scrollTo(0, 0);
     }
   };
-
+ 
   // Check if a step is valid
   const checkStepValidation = async (stepIndex: number): Promise<boolean> => {
     const fieldsToValidate = getFieldsForStep(stepIndex);
     if (fieldsToValidate.length === 0) return true;
-
+ 
     const values = getValues();
     const errors = formState.errors;
-
+ 
     // Check if all required fields for this step have values and no errors
     for (const field of fieldsToValidate) {
       const value = values[field];
@@ -281,6 +289,10 @@ export default function StoreCreatorForm() {
         "VITE_LANGUAGE",
         "VITE_COLOR1",
         "VITE_COLOR2",
+        "VITE_FOOTER_COLOR",
+        "VITE_LOGO",
+        "VITE_BANNER",
+        "VITE_MOBILE_BANNER",
         "VITE_TYPOGRAPHY",
         "VITE_COMPANY_NAME",
         "VITE_COMPANY_ADDRESS",
@@ -301,32 +313,30 @@ export default function StoreCreatorForm() {
         // "VITE_SALE_ITEMS_POLICY",
         "VITE_CHECKOUT_DOMAIN",
         "VITE_CHECKOUT_ID",
+        "VITE_SQUARE_LOGO",
         "VITE_OFFER_ID_TYPE",
       ];
       const optionalFields = [
         "VITE_SHOPIFY_EMAIL",
-        "VITE_LOGO",
-        "VITE_BANNER",
-        "VITE_SQUARE_LOGO",
         "customOffers",
       ];
-
+ 
       // For required fields, check if they have values
       if (requiredFields.includes(field)) {
         if (!value || hasError) {
           return false;
         }
       }
-
+ 
       // For optional fields, they are always valid
       if (optionalFields.includes(field)) {
         continue;
       }
     }
-
+ 
     return true;
   };
-
+ 
   // Update validation status for all steps
   const updateValidationStatus = async () => {
     const newValidationStatus = await Promise.all(
@@ -334,7 +344,7 @@ export default function StoreCreatorForm() {
     );
     setStepValidationStatus(newValidationStatus);
   };
-
+ 
   // Jump to a specific step
   const goToStep = (stepIndex: number) => {
     console.log("goToStep :", currentStep, stepIndex);
@@ -345,15 +355,15 @@ export default function StoreCreatorForm() {
         newCompletionStatus[currentStep] = true;
         setStepCompletionStatus(newCompletionStatus);
       }
-
+ 
       setCurrentStep(stepIndex);
       window.scrollTo(0, 0);
-
+ 
       // Update validation status
       setTimeout(() => updateValidationStatus(), 100);
     }
   };
-
+ 
   // Get fields to validate for each step
   const getFieldsForStep = (step: number): (keyof StoreFormData)[] => {
     switch (step) {
@@ -375,6 +385,7 @@ export default function StoreCreatorForm() {
           "VITE_FOOTER_COLOR",
           "VITE_LOGO",
           "VITE_BANNER",
+          "VITE_MOBILE_BANNER",
           "VITE_TYPOGRAPHY",
         ];
       case 3:
@@ -410,16 +421,16 @@ export default function StoreCreatorForm() {
         return [];
     }
   };
-
+ 
   // Handle form submission
   const handleSubmit = async (data: StoreFormData) => {
     setIsSubmitting(true);
     setSubmitError(null);
-
+ 
     try {
       // Call the API to create the store
       console.log("responseData :", data);
-
+ 
       // Set success state
       setSubmitSuccess(true);
     } catch (error) {
@@ -432,7 +443,7 @@ export default function StoreCreatorForm() {
       setIsSubmitting(false);
     }
   };
-
+ 
   // Reset the form
   const resetForm = () => {
     form.reset(initialFormData);
@@ -444,7 +455,7 @@ export default function StoreCreatorForm() {
     setStepCompletionStatus([false, false, false, false, false, false]);
     setStepValidationStatus([false, false, false, false, false, false]);
   };
-
+ 
   // Render the current step
   const renderStep = () => {
     switch (currentStep) {
@@ -492,7 +503,7 @@ export default function StoreCreatorForm() {
         return null;
     }
   };
-
+ 
   return (
     <Form {...form}>
       <div className="max-w-7xl mx-auto bg-white dark:bg-background rounded-lg shadow-md p-6">
@@ -508,3 +519,5 @@ export default function StoreCreatorForm() {
     </Form>
   );
 }
+ 
+ 

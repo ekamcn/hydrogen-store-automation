@@ -272,7 +272,6 @@ export default function StoreCreator() {
       setShopifyStatus((prev) => ({
         ...prev,
         storeUrl: data.storeUrl,
-        isProcessing: false,
       }));
     });
 

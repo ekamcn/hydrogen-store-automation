@@ -116,7 +116,9 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
           name="VITE_LOGO"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Logo</FormLabel>
+              <FormLabel>
+                Logo <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="file"
@@ -153,7 +155,9 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
           name="VITE_BANNER"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Banner Image (Optional)</FormLabel>
+              <FormLabel>
+                Banner Image <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="file"
@@ -190,7 +194,9 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
           name="VITE_MOBILE_BANNER"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mobile Banner</FormLabel>
+              <FormLabel>
+                Mobile Banner <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="file"
