@@ -13,6 +13,71 @@ export async function POST(request: NextRequest) {
       let groupedMedia: { handle: any; media: any[]; }[] = [];
       let currentHandle: string | null = null;
       let currentMediaGroup: { originalSource: any; alt: any; contentType: string; filename?: string; }[] = [];
+      const createMetaFieldMutation = `
+  mutation CreateMetafieldDefinition($definition: MetafieldDefinitionInput!) {
+    metafieldDefinitionCreate(definition: $definition) {
+      createdDefinition {
+        id
+        name
+      }
+      userErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+const collectionMetafieldsVariables = {
+  definition: {
+    name: "Theme Types",
+    namespace: "custom",
+    key: "theme_types",
+    description: "A list of materials used to make the product.",
+    type: "single_line_text_field",
+    ownerType: "PRODUCT",
+    pin: true,
+    access: {
+      storefront: "PUBLIC_READ",
+    },
+  },
+};
+
+      try {
+
+        const metafieldResponse =await fetch(SHOPIFY_ADMIN_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Shopify-Access-Token": SHOPIFY_ADMIN_ACCESS_TOKEN,
+          },
+          body: JSON.stringify({
+            query: createMetaFieldMutation,
+            variables: collectionMetafieldsVariables,
+          }),
+        });
+
+        const metafieldData = await metafieldResponse.json();
+  
+        if (
+          metafieldData.metafieldDefinitionCreate &&
+          metafieldData.metafieldDefinitionCreate.userErrors.length > 0
+        ) {
+          console.warn(
+            "Metafield creation warning:",
+            metafieldData.metafieldDefinitionCreate.userErrors
+          );
+          // not fatal – metafield might already exist
+        } else {
+          console.log(
+            "Metafield created:",
+            metafieldData.metafieldDefinitionCreate?.createdDefinition
+          );
+        }
+      } catch (err) {
+        console.warn("Metafield creation failed (might already exist):", err);
+      }
 
       // 🧩 Group media by Handle
       parsedCsvData.forEach((row: { [x: string]: string; }, index: number) => {
