@@ -33,32 +33,32 @@ const storeEditorFormSchema = z.object({
   VITE_SHOPIFY_URL: z.string().min(1, "Shopify Store URL is required"),
   VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
   VITE_COMPANY_ADDRESS: z.string().min(1, "Company address is required"),
-  VITE_COMPANY_CITY: z.string().min(1, "Company city is required"),
+  VITE_COMPANY_CITY: z.string().min(1, "Company city is required") .optional(),
   VITE_SIREN_NUMBER: z
     .string()
     .min(1, "Company business registration number / SIREN is required"),
-  VITE_PP_LAST_UPDATED_DATE: z.string().min(1, "Policy updated at is required"),
-  VITE_BUSINESS_HOURS: z.string().min(1, "Business hours are required"),
-  VITE_REFUND_PERIOD: z.string().min(1, "Refund period is required"),
-  VITE_REFUND_PROCESSING_TIME: z
-    .string()
-    .min(1, "Refund processing time is required"),
-  VITE_DELIVERY_PROVIDER: z.string().min(1, "Delivery provider is required"),
-  VITE_ORDER_PROCESSING_TIME: z
-    .string()
-    .min(1, "Order processing time is required"),
-  VITE_STANDARD_DELIVERY_TIME: z
-    .string()
-    .min(1, "Standard delivery time is required"),
-  VITE_RETURN_PERIOD: z.string().min(1, "Return period is required"),
-  VITE_DELIVERY_AREAS: z.string().min(1, "Delivery areas are required"),
-  VITE_SUPPORT_HOURS: z.string().min(1, "Support hours are required"),
-  VITE_WITHDRAWAL_PERIOD: z.string().optional(),
-  VITE_RETURN_SHIPPING_POLICY: z
-    .string()
-    .min(1, "Return shipping policy is required"),
-  VITE_SALE_ITEMS_POLICY: z.string().min(1, "Sale items policy is required"),
-  VITE_TC_LAST_UPDATED_DATE: z.string().min(1, "T&C updated at is required"),
+  // VITE_PP_LAST_UPDATED_DATE: z.string().min(1, "Policy updated at is required"),
+  // VITE_BUSINESS_HOURS: z.string().min(1, "Business hours are required"),
+  // VITE_REFUND_PERIOD: z.string().min(1, "Refund period is required"),
+  // VITE_REFUND_PROCESSING_TIME: z
+  //   .string()
+  //   .min(1, "Refund processing time is required"),
+  // VITE_DELIVERY_PROVIDER: z.string().min(1, "Delivery provider is required"),
+  // VITE_ORDER_PROCESSING_TIME: z
+  //   .string()
+  //   .min(1, "Order processing time is required"),
+  // VITE_STANDARD_DELIVERY_TIME: z
+  //   .string()
+  //   .min(1, "Standard delivery time is required"),
+  // VITE_RETURN_PERIOD: z.string().min(1, "Return period is required"),
+  // VITE_DELIVERY_AREAS: z.string().min(1, "Delivery areas are required"),
+  // VITE_SUPPORT_HOURS: z.string().min(1, "Support hours are required"),
+  // VITE_WITHDRAWAL_PERIOD: z.string().optional(),
+  // VITE_RETURN_SHIPPING_POLICY: z
+  //   .string()
+  //   .min(1, "Return shipping policy is required"),
+  // VITE_SALE_ITEMS_POLICY: z.string().min(1, "Sale items policy is required"),
+  // VITE_TC_LAST_UPDATED_DATE: z.string().min(1, "T&C updated at is required"),
 });
 
 export type StoreEditorFormData = z.infer<typeof storeEditorFormSchema>;
@@ -75,20 +75,20 @@ const initialFormData: Partial<StoreEditorFormData> = {
   VITE_COMPANY_ADDRESS: "",
   VITE_COMPANY_CITY: "",
   VITE_SIREN_NUMBER: "",
-  VITE_PP_LAST_UPDATED_DATE: "",
-  VITE_BUSINESS_HOURS: "",
-  VITE_REFUND_PERIOD: "",
-  VITE_REFUND_PROCESSING_TIME: "",
-  VITE_DELIVERY_PROVIDER: "",
-  VITE_ORDER_PROCESSING_TIME: "",
-  VITE_STANDARD_DELIVERY_TIME: "",
-  VITE_RETURN_PERIOD: "",
-  VITE_DELIVERY_AREAS: "",
-  VITE_SUPPORT_HOURS: "",
-  VITE_WITHDRAWAL_PERIOD: "",
-  VITE_RETURN_SHIPPING_POLICY: "",
-  VITE_SALE_ITEMS_POLICY: "",
-  VITE_TC_LAST_UPDATED_DATE: "",
+  // VITE_PP_LAST_UPDATED_DATE: "",
+  // VITE_BUSINESS_HOURS: "",
+  // VITE_REFUND_PERIOD: "",
+  // VITE_REFUND_PROCESSING_TIME: "",
+  // VITE_DELIVERY_PROVIDER: "",
+  // VITE_ORDER_PROCESSING_TIME: "",
+  // VITE_STANDARD_DELIVERY_TIME: "",
+  // VITE_RETURN_PERIOD: "",
+  // VITE_DELIVERY_AREAS: "",
+  // VITE_SUPPORT_HOURS: "",
+  // VITE_WITHDRAWAL_PERIOD: "",
+  // VITE_RETURN_SHIPPING_POLICY: "",
+  // VITE_SALE_ITEMS_POLICY: "",
+  // VITE_TC_LAST_UPDATED_DATE: "",
 };
 
 const steps = [
@@ -144,20 +144,20 @@ function buildUpdatePayload(values: StoreEditorFormData) {
     companyAddress: values.VITE_COMPANY_ADDRESS,
     companyCity: values.VITE_COMPANY_CITY,
     companyBusinessNumber: values.VITE_SIREN_NUMBER,
-    policyUpdatedAt: values.VITE_PP_LAST_UPDATED_DATE,
-    businessHours: values.VITE_BUSINESS_HOURS,
-    refundPeriod: values.VITE_REFUND_PERIOD,
-    refundProcessingTime: values.VITE_REFUND_PROCESSING_TIME,
-    deliveryProvider: values.VITE_DELIVERY_PROVIDER,
-    deliveryAreas: values.VITE_DELIVERY_AREAS,
-    orderProcessingTime: values.VITE_ORDER_PROCESSING_TIME,
-    standardDeliveryTime: values.VITE_STANDARD_DELIVERY_TIME,
-    returnPeriod: values.VITE_RETURN_PERIOD,
-    supportHours: values.VITE_SUPPORT_HOURS,
-    withdrawalPeriod: values.VITE_WITHDRAWAL_PERIOD,
-    returnShippingPolicy: values.VITE_RETURN_SHIPPING_POLICY,
-    saleItemsPolicy: values.VITE_SALE_ITEMS_POLICY,
-    termsOfServiceUpdateAt: values.VITE_TC_LAST_UPDATED_DATE,
+    // policyUpdatedAt: values.VITE_PP_LAST_UPDATED_DATE,
+    // businessHours: values.VITE_BUSINESS_HOURS,
+    // refundPeriod: values.VITE_REFUND_PERIOD,
+    // refundProcessingTime: values.VITE_REFUND_PROCESSING_TIME,
+    // deliveryProvider: values.VITE_DELIVERY_PROVIDER,
+    // deliveryAreas: values.VITE_DELIVERY_AREAS,
+    // orderProcessingTime: values.VITE_ORDER_PROCESSING_TIME,
+    // standardDeliveryTime: values.VITE_STANDARD_DELIVERY_TIME,
+    // returnPeriod: values.VITE_RETURN_PERIOD,
+    // supportHours: values.VITE_SUPPORT_HOURS,
+    // withdrawalPeriod: values.VITE_WITHDRAWAL_PERIOD,
+    // returnShippingPolicy: values.VITE_RETURN_SHIPPING_POLICY,
+    // saleItemsPolicy: values.VITE_SALE_ITEMS_POLICY,
+    // termsOfServiceUpdateAt: values.VITE_TC_LAST_UPDATED_DATE,
   };
 }
 
@@ -385,20 +385,20 @@ export default function StoreEditorForm() {
           "VITE_COMPANY_ADDRESS",
           "VITE_COMPANY_CITY",
           "VITE_SIREN_NUMBER",
-          "VITE_PP_LAST_UPDATED_DATE",
-          "VITE_TC_LAST_UPDATED_DATE",
-          "VITE_BUSINESS_HOURS",
-          "VITE_REFUND_PERIOD",
-          "VITE_REFUND_PROCESSING_TIME",
-          "VITE_DELIVERY_PROVIDER",
-          "VITE_ORDER_PROCESSING_TIME",
-          "VITE_STANDARD_DELIVERY_TIME",
-          "VITE_RETURN_PERIOD",
-          "VITE_DELIVERY_AREAS",
-          "VITE_SUPPORT_HOURS",
-          "VITE_WITHDRAWAL_PERIOD",
-          "VITE_RETURN_SHIPPING_POLICY",
-          "VITE_SALE_ITEMS_POLICY",
+          // "VITE_PP_LAST_UPDATED_DATE",
+          // "VITE_TC_LAST_UPDATED_DATE",
+          // "VITE_BUSINESS_HOURS",
+          // "VITE_REFUND_PERIOD",
+          // "VITE_REFUND_PROCESSING_TIME",
+          // "VITE_DELIVERY_PROVIDER",
+          // "VITE_ORDER_PROCESSING_TIME",
+          // "VITE_STANDARD_DELIVERY_TIME",
+          // "VITE_RETURN_PERIOD",
+          // "VITE_DELIVERY_AREAS",
+          // "VITE_SUPPORT_HOURS",
+          // "VITE_WITHDRAWAL_PERIOD",
+          // "VITE_RETURN_SHIPPING_POLICY",
+          // "VITE_SALE_ITEMS_POLICY",
         ];
       default:
         return [];
