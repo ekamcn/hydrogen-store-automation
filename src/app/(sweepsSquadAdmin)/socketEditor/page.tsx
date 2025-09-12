@@ -7,6 +7,7 @@ import { io, Socket } from "socket.io-client";
 import { useStoreContext } from "@/utils/storeContext";
 import { buildStorePayload } from "@/components/common/storefront";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // Define the type for the context payload (only relevant fields)
 interface StorePayload {
@@ -95,6 +96,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 export default function StoreEditor() {
   const { payload: contextPayload } = useStoreContext();
+  const router = useRouter();
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState<
     Array<{
@@ -183,10 +185,10 @@ export default function StoreEditor() {
       console.log("Received shopify:authurl:", data);
       addMessage(
         "shopify:authurl",
-        `🔗 Auth URL Generated: ${data.authUrl || "N/A"}`,
+        `🔗 Auth URL Generated: ${data || "N/A"}`,
         data
       );
-      setShopifyStatus((prev) => ({ ...prev, authUrl: data.authUrl }));
+      setShopifyStatus((prev) => ({ ...prev, authUrl: data }));
       if (typeof data === "string" && data.startsWith("http")) {
         window.open(data, "_blank");
       }
@@ -234,6 +236,8 @@ export default function StoreEditor() {
         data
       );
       setShopifyStatus((prev) => ({ ...prev, isProcessing: false }));
+      // Navigate to all customers after successful update
+      router.push("/allCustomers");
     });
 
     socket.on("shopify:storeurl", (data) => {
@@ -344,12 +348,12 @@ export default function StoreEditor() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
-          <input
+          {/* <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
             className="mb-2"
-          />
+          /> */}
           <Button
             onClick={updateShopifyStore}
             disabled={!isConnected || shopifyStatus.isProcessing}
