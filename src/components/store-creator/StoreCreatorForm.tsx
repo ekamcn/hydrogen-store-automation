@@ -64,10 +64,8 @@ const storeFormSchema = z.object({
       base64: z.string().min(1, "Mobile banner is required"),
       fileName: z.string().min(1, "Mobile banner file name is required"),
     })
-    .refine((data) => data && data.base64 && data.fileName, {
-      message: "Mobile banner is required",
-    }),
-  VITE_TYPOGRAPHY: z.enum(["sans-serif", "serif", "monospace"]),
+    .optional(),
+  VITE_TYPOGRAPHY: z.enum(["sans-serif", "serif", "monospace", "system-ui", "georgia"]),
  
   // Legal Information
   VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
@@ -222,6 +220,46 @@ export default function StoreCreatorForm() {
   });
  
   const { trigger, getValues, formState, watch } = form;
+
+  // Color mapping by GEO (derived from language) and category
+  // GEO mapping rule: fr -> FR, en -> US
+  const geoCategoryColorMap: Record<string, Record<string, { primary: string; secondary: string; footer: string }>> = {
+    FR: {
+      baby: { primary: "#F71CAC", secondary: "#121212", footer: "#FFFFFF" },
+      diy: { primary: "#EAC002", secondary: "#121212", footer: "#EAC002" },
+      pets: { primary: "#03BF74", secondary: "#03BF74", footer: "#121212" },
+      deco: { primary: "#9e846f", secondary: "#121212", footer: "#9e846f" },
+      automoto: { primary: "#FE6F35", secondary: "#121212", footer: "#FE6F35" },
+    },
+    US: {
+      baby: { primary: "#4CDBE9", secondary: "#121212", footer: "#4CDBE9" },
+      diy: { primary: "#EAC002", secondary: "#121212", footer: "#EAC002" },
+      pets: { primary: "#00bf75", secondary: "#121212", footer: "#00bf75" },
+      deco: { primary: "#9e846f", secondary: "#121212", footer: "#9e846f" },
+      automoto: { primary: "#f21010", secondary: "#121212", footer: "#f21010" },
+    },
+  };
+
+  // Auto-fill colors when category or language changes
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name !== "VITE_CATEGORY" && name !== "VITE_LANGUAGE") return;
+
+      const selectedCategory = (value.VITE_CATEGORY || "").toString().toLowerCase();
+      const selectedLanguage = (value.VITE_LANGUAGE || "en").toString().toLowerCase();
+      const geo = selectedLanguage === "fr" ? "FR" : "US";
+
+      const colors = geoCategoryColorMap[geo]?.[selectedCategory];
+      if (!colors) return;
+
+      // Set the three color fields based on mapping
+      form.setValue("VITE_COLOR1", colors.primary, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+      form.setValue("VITE_COLOR2", colors.secondary, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+      form.setValue("VITE_FOOTER_COLOR", colors.footer, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    });
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch]);
  
   // Watch form changes to update validation status
   useEffect(() => {
@@ -292,7 +330,6 @@ export default function StoreCreatorForm() {
         "VITE_FOOTER_COLOR",
         "VITE_LOGO",
         "VITE_BANNER",
-        "VITE_MOBILE_BANNER",
         "VITE_TYPOGRAPHY",
         "VITE_COMPANY_NAME",
         "VITE_COMPANY_ADDRESS",
@@ -319,6 +356,7 @@ export default function StoreCreatorForm() {
       const optionalFields = [
         "VITE_SHOPIFY_EMAIL",
         "customOffers",
+        "VITE_MOBILE_BANNER",
       ];
  
       // For required fields, check if they have values
