@@ -23,6 +23,8 @@ export default function LegalInformation({
   nextStep,
   prevStep,
 }: LegalInformationProps) {
+  const language = form.watch("VITE_LANGUAGE");
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -55,23 +57,25 @@ export default function LegalInformation({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="VITE_COMPANY_BUSINESS_NUMBER"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Business Registration Number / SIREN{" "}
-                    <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your business number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {language === "fr" && (
               <FormField
+                control={form.control}
+                name="VITE_COMPANY_BUSINESS_NUMBER"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>
+                      Business Registration Number / SIREN{" "}
+                      <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your business number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <FormField
               control={form.control}
               name="VITE_COMPANY_CITY"
               render={({ field }) => (

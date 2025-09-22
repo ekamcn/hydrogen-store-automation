@@ -4,8 +4,7 @@ import { StoreFormData } from '../StoreCreatorForm';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+// removed unused imports
 import { fileToBase64 } from '@/utils/fileToBase64';
 
 type BrandCustomizationProps = {
@@ -20,7 +19,7 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Brand Customization</h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Customize your store's visual identity with colors and branding assets.
+          Customize your store&apos;s visual identity with colors and branding assets.
         </p>
       </div>
 
@@ -107,10 +106,7 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
               </FormItem>
             )}
           />
- 
         </div>
-
-
         <FormField
           control={form.control}
           name="VITE_LOGO"
@@ -195,7 +191,8 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Mobile Banner <span className="text-red-500">*</span>
+                Mobile Banner 
+                {/* <span className="text-red-500">*</span> */}
               </FormLabel>
               <FormControl>
                 <Input
@@ -235,16 +232,18 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
             <FormItem>
               <FormLabel>Typography *</FormLabel>
               <FormControl>
-              <div className="flex items-center space-x-2">
-                     <Input
-                      type="text"
-                      placeholder='Enter Custom Font Family'
-                      {...field}
-                      className="w-42 h-10 p-1 border rounded"
-                    />
-                  </div>
-          
-                
+                <div className="flex items-center space-x-2">
+                  <select
+                    {...field}
+                    className="w-42 h-10 p-1 border rounded"
+                  >
+                    <option value="sans-serif">Sans Serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="monospace">Monospace</option>
+                    <option value="system-ui">System UI</option>
+                    <option value="georgia">Georgia</option>
+                  </select>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
