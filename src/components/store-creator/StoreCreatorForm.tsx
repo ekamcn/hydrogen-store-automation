@@ -71,7 +71,7 @@ const storeFormSchema = z.object({
   VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
   VITE_COMPANY_ADDRESS: z.string().min(1, "Company address is required"),
   VITE_COMPANY_CITY: z.string().min(1, "Company city is required"),
-  VITE_COMPANY_BUSINESS_NUMBER: z.string().min(1, "Company business registration number / SIREN is required").optional(), // Made optional
+  VITE_COMPANY_BUSINESS_NUMBER: z.string().optional(), // Made optional
   // Policy Information
   VITE_POLICY_UPDATED_AT: z.string().min(1, "Policy updated at is required"),
   VITE_TERMS_OF_SERVICE_UPDATE_AT: z.string().min(1, "Terms of service update date is required"),
