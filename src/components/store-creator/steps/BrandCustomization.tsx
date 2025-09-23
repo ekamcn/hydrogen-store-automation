@@ -152,7 +152,7 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Banner Image <span className="text-red-500">*</span>
+                Banner Image (Upload image in 1920×1080 (16:9) resolution or higher) <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
                 <Input
@@ -191,7 +191,7 @@ export default function BrandCustomization({ form, nextStep, prevStep }: BrandCu
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Mobile Banner 
+                Mobile Banner (Upload image in 1920×1080 (16:9) resolution or higher)
                 {/* <span className="text-red-500">*</span> */}
               </FormLabel>
               <FormControl>
