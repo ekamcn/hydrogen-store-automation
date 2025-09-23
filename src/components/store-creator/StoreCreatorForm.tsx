@@ -71,9 +71,7 @@ const storeFormSchema = z.object({
   VITE_COMPANY_NAME: z.string().min(1, "Company name is required"),
   VITE_COMPANY_ADDRESS: z.string().min(1, "Company address is required"),
   VITE_COMPANY_CITY: z.string().min(1, "Company city is required"),
-  VITE_COMPANY_BUSINESS_NUMBER: z
-    .string()
-    .min(1, "Company business registration number / SIREN is required"),
+  VITE_COMPANY_BUSINESS_NUMBER: z.string().min(1, "Company business registration number / SIREN is required").optional(), // Made optional
   // Policy Information
   VITE_POLICY_UPDATED_AT: z.string().min(1, "Policy updated at is required"),
   VITE_TERMS_OF_SERVICE_UPDATE_AT: z.string().min(1, "Terms of service update date is required"),
@@ -114,14 +112,26 @@ const storeFormSchema = z.object({
     }),
   VITE_OFFER_ID_TYPE: z.enum(["default", "custom"]),
   customOffers: z
-  .array(
-    z.object({
-      price: z.string().min(1, "Price is required"),
-      offerId: z.string().min(1, "Offer ID is required"),
-    })
-  )
-  .optional()});
- 
+    .array(
+      z.object({
+        price: z.string().min(1, "Price is required"),
+        offerId: z.string().min(1, "Offer ID is required"),
+      })
+    )
+    .optional(),
+}).refine(
+  (data) => {
+    if (data.VITE_LANGUAGE === "fr") {
+      return data.VITE_COMPANY_BUSINESS_NUMBER && data.VITE_COMPANY_BUSINESS_NUMBER.length > 0;
+    }
+    return true; // Optional for English
+  },
+  {
+    message: "Business Registration Number / SIREN is required for French stores",
+    path: ["VITE_COMPANY_BUSINESS_NUMBER"],
+  }
+);
+
 // Define the form data type
 export type StoreFormData = z.infer<typeof storeFormSchema>;
  
@@ -310,8 +320,8 @@ export default function StoreCreatorForm() {
  
     const values = getValues();
     const errors = formState.errors;
- 
-    // Check if all required fields for this step have values and no errors
+    const language = values.VITE_LANGUAGE || "en";
+
     for (const field of fieldsToValidate) {
       const value = values[field];
       const hasError = errors[field];
@@ -321,7 +331,6 @@ export default function StoreCreatorForm() {
         "VITE_CUSTOMER_SERVICE_PHONE",
         "VITE_DOMAIN_NAME",
         "VITE_SHOPIFY_ADMIN_ACCESS_TOKEN",
-        "VITE_COMPANY_BUSINESS_NUMBER",
         "VITE_SHOPIFY_URL",
         "VITE_CATEGORY",
         "VITE_LANGUAGE",
@@ -358,8 +367,14 @@ export default function StoreCreatorForm() {
         "customOffers",
         "VITE_MOBILE_BANNER",
       ];
- 
-      // For required fields, check if they have values
+
+      if (field === "VITE_COMPANY_BUSINESS_NUMBER") {
+        if (language === "fr" && (!value || hasError)) {
+          return false;
+        }
+        continue;
+      }
+
       if (requiredFields.includes(field)) {
         if (!value || hasError) {
           return false;
