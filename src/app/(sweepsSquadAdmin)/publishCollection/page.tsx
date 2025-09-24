@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import SuccessMessage from "@/components/ui/SuccessMessage";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { exportToCSV } from "@/utils/exportToCSV";
-import { useSearchParams,useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface FailedCollectionRecord {
   title?: string;
@@ -75,8 +75,7 @@ export default function CsvPublishPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [hasEmittedCollections, setHasEmittedCollections] = useState(false);
-  const [hasEmittedProducts, setHasEmittedProducts] = useState(false);
-  
+  // const [hasEmittedProducts, setHasEmittedProducts] = useState(false);
 
   // Socket initialization
   useEffect(() => {
@@ -420,39 +419,39 @@ export default function CsvPublishPage() {
     );
 
     // Collections completed
-   socket.on(
-  "publish:collections:completed",
-  (payload: { storeName: string; success: boolean }) => {
-    console.log("Received publish:collections:completed", payload);
-    console.log(
-      "DEBUG: publish:collections:completed payload:",
-      JSON.stringify(payload)
-    );
-    setCollectionSuccess(
-      `Collections completed for ${payload.storeName}: ${
-        payload.success ? "Success" : "Failed"
-      }`
-    );
-    // Trigger products publish if not already emitted
-    if (payload.success && !hasEmittedProducts) {
-      const storeId = searchParams.get("storeId");
-      if (storeId) {
-        console.log("Emitting publish:products", {
-          storeName: payload.storeName,
-          storeId,
-        });
-        socket.emit("publish:products", {
-          storeName: payload.storeName,
-          storeId,
-        });
-        setHasEmittedProducts(true);
-        // setProductStatus("Starting products publish process...");
+    socket.on(
+      "publish:collections:completed",
+      (payload: { storeName: string; success: boolean }) => {
+        console.log("Received publish:collections:completed", payload);
+        console.log(
+          "DEBUG: publish:collections:completed payload:",
+          JSON.stringify(payload)
+        );
+        setCollectionSuccess(
+          `Collections completed for ${payload.storeName}: ${
+            payload.success ? "Success" : "Failed"
+          }`
+        );
+        // Trigger products publish if not already emitted
+        // if (payload.success && !hasEmittedProducts) {
+        // const storeId = searchParams.get("storeId");
+        // if (storeId) {
+        // console.log("Emitting publish:products", {
+        // storeName: payload.storeName,
+        // storeId,
+        // });
+        // socket.emit("publish:products", {
+        // storeName: payload.storeName,
+        // storeId,
+        // });
+        // setHasEmittedProducts(true);
+        // // setProductStatus("Starting products publish process...");
+        // }
+        // }
+        // Redirect to /allCustomers after handling the event
+        router.push("/allCustomers");
       }
-    }
-    // Redirect to /allCustomers after handling the event
-    router.push('/allCustomers');
-  }
-);
+    );
 
     // // Products progress
     // socket.on(
@@ -632,7 +631,7 @@ export default function CsvPublishPage() {
       socket.off("publish:not_found");
       socket.off("publish:category_language");
     };
-  }, [searchParams, hasEmittedCollections, hasEmittedProducts]);
+  }, [searchParams, hasEmittedCollections]);
 
   return (
     <div className="max-w-2xl mx-auto p-6">

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const SHOPIFY_ADMIN_API_URL = process.env.SHOPIFY_ADMIN_API_URL  ;
-const SHOPIFY_ADMIN_ACCESS_TOKEN = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN ;
 
-export async function GET() {
+export async function GET(body: NextRequest) {
   try {
     // GraphQL query to fetch publications
     const query = `
@@ -18,18 +16,19 @@ export async function GET() {
         }
       }
     `;
-
+console.log("body",body);
     // Make the request to Shopify's GraphQL API
-    if (!SHOPIFY_ADMIN_API_URL) {
-      throw new Error('SHOPIFY_ADMIN_API_URL is not defined');
+    if (!body.nextUrl.searchParams.get('shopifyUrl') || !body.nextUrl.searchParams.get('shopifyAdminToken')) {
+      // throw new Error('SHOPIFY_ADMIN_API_URL is not defined');
+      return NextResponse.json({ error: 'SHOPIFY_ADMIN_API_URL is not defined' }, { status: 400 });
     }
-    const response = await fetch(SHOPIFY_ADMIN_API_URL, {
+    const response = await fetch(`${body.nextUrl.searchParams.get('shopifyUrl')}/admin/api/2025-07/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': SHOPIFY_ADMIN_ACCESS_TOKEN ?? '',
+        'X-Shopify-Access-Token': body.nextUrl.searchParams.get('shopifyAdminToken'),
       },
-      body: JSON.stringify({ query }),
+      body: JSON.stringify({ query: query }),
     });
 
     if (!response.ok) {
@@ -46,3 +45,4 @@ export async function GET() {
     );
   }
 }
+
