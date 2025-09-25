@@ -427,31 +427,31 @@ export default function CsvPublishPage() {
           "DEBUG: publish:collections:completed payload:",
           JSON.stringify(payload)
         );
+    
         setCollectionSuccess(
           `Collections completed for ${payload.storeName}: ${
             payload.success ? "Success" : "Failed"
           }`
         );
-        // Trigger products publish if not already emitted
-        // if (payload.success && !hasEmittedProducts) {
-        // const storeId = searchParams.get("storeId");
-        // if (storeId) {
-        // console.log("Emitting publish:products", {
-        // storeName: payload.storeName,
-        // storeId,
-        // });
-        // socket.emit("publish:products", {
-        // storeName: payload.storeName,
-        // storeId,
-        // });
-        // setHasEmittedProducts(true);
-        // // setProductStatus("Starting products publish process...");
-        // }
-        // }
-        // Redirect to /allCustomers after handling the event
-        router.push("/allCustomers");
+    
+        const formattedStoreName = encodeURIComponent(payload.storeName);
+        const downloadUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${formattedStoreName}.zip`;
+    
+        // Trigger ZIP download
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", `${formattedStoreName}.zip`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          router.push("/allCustomers");
+        }, 2000);
       }
     );
+    
 
     // // Products progress
     // socket.on(
