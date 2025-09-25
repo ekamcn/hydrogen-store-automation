@@ -1,51 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import FileUpload from "@/components/ui/FileUpload";
+import React, { useState, useEffect, useRef } from "react";
+// import FileUpload from "@/components/ui/FileUpload";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import SuccessMessage from "@/components/ui/SuccessMessage";
 import ErrorMessage from "@/components/ui/ErrorMessage";
-import { parseCsvToJson } from "@/utils/parseCSV";
 import { exportToCSV } from "@/utils/exportToCSV";
-// import { StoreSelect } from "@/components/common/storefront";
-
-interface Store {
-  store_id: string;
-  storeName: string;
-  storeUrl: string;
-  status: string;
-  email: string;
-  phone: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface GraphQLError {
-  message: string;
-  locations?: { line: number; column: number }[];
-  path?: string[];
-  extensions?: {
-    code?: string;
-    problems?: Array<{
-      path: string[];
-      explanation: string;
-    }>;
-  };
-}
+import { io, Socket } from "socket.io-client";
+import { useRouter } from "next/navigation";
 
 interface Publication {
   id: string;
   name: string;
 }
-
-interface CollectionRules {
-  column: string;
-  relation: string;
-  condition: string;
-}
-
 interface CSVRowData {
   title: string;
   description: string;
@@ -62,7 +31,6 @@ interface FailedCollectionRecord extends CSVRowData, Record<string, unknown> {
 }
 
 export default function CsvCollectionPage() {
-  const [file, setFile] = useState<File | null>(null);
   const [publications, setPublications] = useState<Publication[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -71,7 +39,7 @@ export default function CsvCollectionPage() {
     Array<{ publicationId: string; publicationName: string }>
   >([]);
   const [apiErrors, setApiErrors] = useState<{ [key: string]: string }>({});
-  const [csvData, setCsvData] = useState<CSVRowData[]>([]);
+  const [csvData] = useState<CSVRowData[]>([]);
   const [failedRecords, setFailedRecords] = useState<FailedCollectionRecord[]>(
     []
   );
@@ -86,78 +54,122 @@ export default function CsvCollectionPage() {
     successful: 0,
     failed: 0,
   });
+  const [stores, setStores] = useState<
+    Array<{ store_id: string; storeName: string }>
+  >([]);
+  const [isLoadingStores, setIsLoadingStores] = useState(false);
+  const [selectedStoreName, setSelectedStoreName] = useState<string>("");
+  // const [shopifyAdminToken, setShopifyAdminToken] = useState<string>("");
+  // const [shopifyUrl, setShopifyUrl] = useState<string>("");
+  const socketRef = useRef<Socket | null>(null);
+  const router = useRouter();
 
-  // Fetch publications on component mount
   useEffect(() => {
-    const fetchPublications = async () => {
+    const serverUrl = `http://51.112.151.1`;
+    socketRef.current = io(serverUrl, {
+      transports: ["websocket", "polling"],
+      path: "/backend/socket.io",
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1500,
+      forceNew: true,
+    });
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []);
+
+  // Load stores list
+  useEffect(() => {
+    const loadStores = async () => {
+      try {
+        setIsLoadingStores(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/store/all`
+        );
+        if (!res.ok) throw new Error("Failed to fetch store data");
+        const data = await res.json();
+        const list: Array<{ store_id: string; storeName: string }> =
+          Array.isArray(data?.stores) ? data.stores : [];
+        setStores(
+          list.map((s: { store_id: string; storeName: string }) => ({
+            store_id: s.store_id,
+            storeName: s.storeName,
+          }))
+        );
+      } catch {
+        setStores([]);
+      } finally {
+        setIsLoadingStores(false);
+      }
+    };
+    loadStores();
+  }, []);
+
+  useEffect(() => {
+    const run = async () => {
+      let shopifyAdminToken = "";
+      let shopifyUrl = "";
+      let shopifyLink = "";
+
+      if (!selectedStoreName) return;
+
+      try {
+        const envResponse = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_BACKEND_URL
+          }/store/env?storeName=${encodeURIComponent(selectedStoreName)}`
+        );
+        const envData = await envResponse.json();
+        console.log("envData", envData);
+
+        shopifyAdminToken = envData?.data?.shopifyAdminToken || "";
+        shopifyUrl = envData?.data?.shopifyUrl || "";
+
+        shopifyLink = shopifyUrl.startsWith("https://")
+          ? shopifyUrl
+          : "https://" + shopifyUrl;
+      } catch {
+        // ignore
+      }
+
       try {
         setLoading(true);
-        const response = await fetch("/api/get-publications");
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          if (
-            typeof errorData === "object" &&
-            errorData !== null &&
-            "message" in errorData
-          ) {
-            throw new Error(
-              (errorData as { message?: string }).message ||
-                "Failed to fetch publications"
-            );
-          } else {
-            throw new Error("Failed to fetch publications");
-          }
-        }
+        const response = await fetch(
+          `/api/get-publications?shopifyUrl=${shopifyLink}&shopifyAdminToken=${shopifyAdminToken}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch publications");
 
         const data = await response.json();
-        if (
-          typeof data === "object" &&
-          data !== null &&
-          "data" in data &&
-          (data as any).data.publications
-        ) {
-          const publicationsData = (data as any).data.publications.edges.map(
-            (edge: { node: { id: string; name: string } }) => ({
-              id: edge.node.id,
-              name: edge.node.name,
-            })
-          );
-          setPublications(publicationsData);
+        const pubs: Publication[] = (data?.data?.publications?.edges || []).map(
+          (edge: { node: { id: string; name: string } }) => ({
+            id: edge?.node?.id,
+            name: edge?.node?.name,
+          })
+        );
 
-          // Select all publications by default
-          const allPublicationIds = publicationsData.map(
-            (pub: Publication) => ({
-              publicationId: pub.id,
-              publicationName: pub.name,
-            })
-          );
-          // console.log("Selecting all publications:", allPublicationNames);
-          setSelectedPublications(allPublicationIds);
-        } else {
-          setPublications([]);
-        }
-      } catch (error) {
-        console.error("Error fetching publications:", error);
-        setError("Failed to load publications. Please try again later.");
+        setPublications(pubs);
+        setSelectedPublications(
+          pubs.map((p) => ({
+            publicationId: p.id,
+            publicationName: p.name,
+          }))
+        );
+      } catch (err) {
+        setPublications([]);
+        setSelectedPublications([]);
         setApiErrors((prev) => ({
           ...prev,
           publications:
-            (error as Error).message || "Failed to load publications",
+            (err as Error)?.message || "Failed to load publications",
         }));
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPublications();
-  }, []);
-
-  const handleFileSelect = (selectedFile: File) => {
-    setFile(selectedFile);
-    setError("");
-    setApiErrors({});
-  };
+    run();
+  }, [selectedStoreName]);
 
   const handlePublicationToggle = (publication: {
     publicationId: string;
@@ -185,7 +197,7 @@ export default function CsvCollectionPage() {
   };
 
   console.log(selectedPublications, "selectedPublications");
-  // Helper functions for selecting/deselecting all publications
+
   const selectAllPublications = () => {
     const allPublicationIds = publications.map((pub: Publication) => ({
       publicationId: pub.id,
@@ -199,9 +211,8 @@ export default function CsvCollectionPage() {
   };
 
   const processCSV = async () => {
-
-    if (!file) {
-      setError("Please upload a CSV file");
+    if (!selectedStoreName) {
+      setError("Please select a store");
       return;
     }
     if (selectedPublications.length === 0) {
@@ -225,52 +236,21 @@ export default function CsvCollectionPage() {
     });
 
     try {
-      // Parse CSV file using the utility function
-      const parsedCsvData = await parseCsvToJson(file);
-      if (!parsedCsvData || parsedCsvData.length < 1) {
-        throw new Error("CSV file must contain at least one row of data");
-      }
-      setCsvData(parsedCsvData);
-      console.log("above response");
-      // Send all parsedCsvData in a single API call
-      const response = await fetch("/api/upload-products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          parsedCsvData,
-          publications: selectedPublications,
-        }),
-      });
-      console.log(response,"productsCsv")
-      const result: any = await response.json();
-      if (!response.ok || !result.success) {
-        setError(result.message || "Failed to upload products");
-        setFailedRecords(
-          parsedCsvData.map((row: any) => ({
-            ...row,
-            error: result.message || "Upload failed",
-          }))
+      // Save minimal payload and navigate to socket page to handle emitting and UI
+      const payload = {
+        storeName: selectedStoreName,
+        publications: selectedPublications,
+      };
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "publishProductsPayload",
+          JSON.stringify(payload)
         );
-        setProcessingStatus({
-          total: parsedCsvData.length,
-          processed: parsedCsvData.length,
-          successful: 0,
-          failed: parsedCsvData.length,
-        });
-        setLoading(false);
-        return;
       }
-
-      setSuccess("Products uploaded successfully!");
-      setProcessingStatus({
-        total: parsedCsvData.length,
-        processed: parsedCsvData.length,
-        successful: parsedCsvData.length,
-        failed: 0,
-      });
-      setLoading(false);
-    } catch (err: any) {
-      setError(err.message || "Failed to process CSV");
+      router.push("/product-publish");
+    } catch (err) {
+      setError((err as Error).message || "Failed to start publish process");
+    } finally {
       setLoading(false);
     }
   };
@@ -278,36 +258,31 @@ export default function CsvCollectionPage() {
   return (
     <div className="max-w-2xl mx-auto p-6 ">
       <h1 className="text-3xl font-bold mb-6">Create Products from CSV</h1>
-      {/* Store Select Box */}
-      {/* <StoreSelect onSelect={setSelectedStore} /> */}
 
-      {/* <Card className="p-4 mb-6 bg-blue-50">
-        <h3 className="text-lg font-semibold text-blue-800 mb-2">
-          Instructions:
-        </h3>
-        <ol className="list-decimal pl-5 space-y-2 text-sm text-blue-700">
-          <li>
-            Upload a CSV file with collection data (title, description, handle,
-            match_any, type, operator, value)
-          </li>
-          <li>
-            Select publication channels where your collections should be
-            published
-          </li>
-          <li>
-            Click &quot;Create & Publish Collections&quot; to process the file
-          </li>
-          <li>
-            If any collections fail to create, you can download a CSV of failed
-            records
-          </li>
-          <li>
-            The downloaded CSV includes an &quot;error&quot; column with details
-            about why each record failed
-          </li>
-          <li>Fix the errors in the downloaded CSV and re-upload to retry</li>
-        </ol>
-      </Card> */}
+      {/* Store Select */}
+      <Card className="p-6 mb-6">
+        <div>
+          <label htmlFor="storeName" className="block text-sm font-medium mb-2">
+            Select Store
+          </label>
+          <select
+            id="storeName"
+            className="w-full border rounded-md h-10 px-3 text-sm"
+            value={selectedStoreName}
+            onChange={(e) => setSelectedStoreName(e.target.value)}
+            disabled={isLoadingStores}
+          >
+            <option value="">
+              {isLoadingStores ? "Loading stores..." : "Select a store"}
+            </option>
+            {stores.map((s) => (
+              <option key={s.store_id} value={s.storeName}>
+                {s.storeName}
+              </option>
+            ))}
+          </select>
+        </div>
+      </Card>
 
       {error && <ErrorMessage message={error} className="mb-4" />}
       {success && <SuccessMessage message={success} className="mb-4" />}
@@ -343,18 +318,6 @@ export default function CsvCollectionPage() {
           </div>
         </Card>
       )}
-
-      <Card className="p-6 mb-6">
-        <FileUpload
-          id="csv-upload"
-          label="Upload CSV File"
-          accept=".csv"
-          onFileSelect={handleFileSelect}
-          required
-          helpText="Upload a CSV file containing products."
-          className="mb-6"
-        />
-      </Card>
 
       <Card className="p-6 mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -599,7 +562,9 @@ export default function CsvCollectionPage() {
       <div className="flex justify-end">
         <Button
           onClick={processCSV}
-          disabled={loading || !file || selectedPublications.length === 0}
+          disabled={
+            loading || !selectedStoreName || selectedPublications.length === 0
+          }
           className="flex items-center bg-[#ababab]"
         >
           {loading ? <LoadingSpinner className="mr-2" /> : null}

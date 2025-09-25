@@ -21,7 +21,7 @@ const items = [
   { title: "Create Store", url: "/store-creator", icon: ScrollText   },
   // { title: "CSV Collection Creator", url: "/csv-collection-creator", icon: FileText },
   { title: "Google Script Form", url: "/google-script-form", icon: Calendar },
-  { title: "CSV Product Creator", url: "/product-uploader", icon: FileText },
+  // { title: "CSV Product Creator", url: "/product-uploader", icon: FileText },
 
 ]
 

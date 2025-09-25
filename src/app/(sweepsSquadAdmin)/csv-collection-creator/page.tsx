@@ -97,7 +97,9 @@ export default function CsvCollectionPage() {
     const fetchPublications = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/get-publications");
+        const response = await fetch(
+          `/api/get-publications`
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -440,9 +442,9 @@ export default function CsvCollectionPage() {
 
             throw new Error(errorMessage);
           }
-  
+
           const createData: any = await createResponse.json();
-  
+
           if (createData?.data?.collectionCreate?.userErrors?.length > 0) {
             const errors = createData.data.collectionCreate.userErrors;
             const errorMsg = errors
@@ -514,25 +516,66 @@ export default function CsvCollectionPage() {
 
           // Publish collection to selected channels
           const failedPublications: Array<{ id: string; error: string }> = [];
-          const publishPromises = selectedPublications.map(async (publicationId) => {
-            try {
-              console.log(
-                `Publishing collection ${collectionId} to publication ${publicationId}`
-              );
-              const response = await fetch("/api/publish-collection", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  collectionId,
-                  publicationId,
-                }),
-              });
-  
-              if (!response.ok) {
-                const errorData: any = await response.json();
-                const errorMessage = errorData?.error || "Unknown error";
+          const publishPromises = selectedPublications.map(
+            async (publicationId) => {
+              try {
+                console.log(
+                  `Publishing collection ${collectionId} to publication ${publicationId}`
+                );
+                const response = await fetch("/api/publish-collection", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    collectionId,
+                    publicationId,
+                  }),
+                });
+
+                if (!response.ok) {
+                  const errorData: any = await response.json();
+                  const errorMessage = errorData?.error || "Unknown error";
+                  console.error(
+                    `Error publishing to publication ${publicationId}:`,
+                    errorMessage
+                  );
+                  failedPublications.push({
+                    id: publicationId,
+                    error: errorMessage,
+                  });
+                  return false;
+                }
+
+                const publishData: any = await response.json();
+                if (
+                  publishData?.data?.publishablePublish?.userErrors?.length > 0
+                ) {
+                  const errors = publishData.data.publishablePublish.userErrors;
+                  const errorMsg = errors
+                    .map(
+                      (err: { field?: string; message: string }) =>
+                        `${err.field || "unknown"}: ${err.message}`
+                    )
+                    .join(", ");
+                  console.error(
+                    `Publish API Error for publication ${publicationId}:`,
+                    errorMsg
+                  );
+                  failedPublications.push({
+                    id: publicationId,
+                    error: errorMsg,
+                  });
+                  return false;
+                }
+
+                console.log(
+                  `Successfully published collection ${collectionId} to publication ${publicationId}`
+                );
+                return true;
+              } catch (error) {
+                const errorMessage =
+                  (error as Error).message || "Unknown error";
                 console.error(
                   `Error publishing to publication ${publicationId}:`,
                   errorMessage
@@ -543,43 +586,6 @@ export default function CsvCollectionPage() {
                 });
                 return false;
               }
-  
-              const publishData: any = await response.json();
-              if (publishData?.data?.publishablePublish?.userErrors?.length > 0) {
-                const errors = publishData.data.publishablePublish.userErrors;
-                const errorMsg = errors
-                  .map(
-                    (err: { field?: string; message: string }) =>
-                      `${err.field || "unknown"}: ${err.message}`
-                  )
-                  .join(", ");
-                console.error(
-                  `Publish API Error for publication ${publicationId}:`,
-                  errorMsg
-                );
-                failedPublications.push({
-                  id: publicationId,
-                  error: errorMsg,
-                });
-                return false;
-              }
-  
-              console.log(
-                `Successfully published collection ${collectionId} to publication ${publicationId}`
-              );
-              return true;
-            } catch (error) {
-              const errorMessage = (error as Error).message || "Unknown error";
-              console.error(
-                `Error publishing to publication ${publicationId}:`,
-                errorMessage
-              );
-              failedPublications.push({
-                id: publicationId,
-                error: errorMessage,
-              });
-              return false;
-            }
             }
           );
 
