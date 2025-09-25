@@ -75,17 +75,42 @@ export default function CustomersTable() {
       });
   }, []);
 
-  const handleDownload = (storeName: string) => {
+  const handleDownload = async (storeName: string) => {
     const formattedStoreName = encodeURIComponent(storeName);
     const downloadUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${formattedStoreName}.zip`;
-    
-    // Create a temporary anchor element to trigger the download
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = `${formattedStoreName}.zip`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    try {
+      // Fetch the file first
+      const response = await fetch(downloadUrl);
+
+      if (!response.ok) {
+        throw new Error("Failed to download file");
+      }
+
+      // Convert response to blob for download
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Trigger download
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `${formattedStoreName}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      // After successful download, call delete API
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/store/delete?storeName=${formattedStoreName}`,
+        {
+          method: "POST",
+        }
+      );
+      window.location.reload();
+    } catch (error) {
+      console.error("Error in download/delete process:", error);
+    }
   };
 
   return (
