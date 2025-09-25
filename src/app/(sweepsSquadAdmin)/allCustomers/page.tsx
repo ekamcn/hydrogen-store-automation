@@ -75,13 +75,17 @@ export default function CustomersTable() {
       });
   }, []);
 
-  // Handler for Publish button
-  const handlePublish = (customer: Store) => {
-    router.push(
-      `/publishCollection?storeName=${encodeURIComponent(
-        customer.storeName
-      )}&storeId=${encodeURIComponent(customer.store_id)}`
-    );
+  const handleDownload = (storeName: string) => {
+    const formattedStoreName = encodeURIComponent(storeName);
+    const downloadUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${formattedStoreName}.zip`;
+    
+    // Create a temporary anchor element to trigger the download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `${formattedStoreName}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -224,14 +228,13 @@ export default function CustomersTable() {
                           >
                             Edit
                           </Button>
-                          {/* <Button
-                            onClick={() => handlePublish(customer)}
-                            disabled={loading || customer.isPublished}
-                            variant="default"
+                          <Button
                             className="bg-blue-600 cursor-pointer text-white w-full sm:w-auto"
+                            onClick={() => handleDownload(customer.storeName)}
+                            variant="default"
                           >
-                            {customer.isPublished ? "Published" : "Publish"}
-                          </Button> */}
+                            Download
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
