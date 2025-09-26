@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import React, { useEffect, useRef, useState } from "react";
 // import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
@@ -75,43 +75,43 @@ export default function CustomersTable() {
       });
   }, []);
 
-  const handleDownload = async (storeName: string) => {
-    const formattedStoreName = encodeURIComponent(storeName);
-    const downloadUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${formattedStoreName}.zip`;
+  // const handleDownload = async (storeName: string) => {
+  //   const formattedStoreName = encodeURIComponent(storeName);
+  //   const downloadUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${formattedStoreName}.zip`;
 
-    try {
-      // Fetch the file first
-      const response = await fetch(downloadUrl);
+  //   try {
+  //     // Fetch the file first
+  //     const response = await fetch(downloadUrl);
 
-      if (!response.ok) {
-        throw new Error("Failed to download file");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to download file");
+  //     }
 
-      // Convert response to blob for download
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
+  //     // Convert response to blob for download
+  //     const blob = await response.blob();
+  //     const blobUrl = window.URL.createObjectURL(blob);
 
-      // Trigger download
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = `${formattedStoreName}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
+  //     // Trigger download
+  //     const link = document.createElement("a");
+  //     link.href = blobUrl;
+  //     link.download = `${formattedStoreName}.zip`;
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //     window.URL.revokeObjectURL(blobUrl);
 
-      // After successful download, call delete API
-      await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/store/delete?storeName=${formattedStoreName}`,
-        {
-          method: "POST",
-        }
-      );
-      window.location.reload();
-    } catch (error) {
-      console.error("Error in download/delete process:", error);
-    }
-  };
+  //     // After successful download, call delete API
+  //     await fetch(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/store/delete?storeName=${formattedStoreName}`,
+  //       {
+  //         method: "POST",
+  //       }
+  //     );
+  //     window.location.reload();
+  //   } catch (error) {
+  //     console.error("Error in download/delete process:", error);
+  //   }
+  // };
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 mt-8">
@@ -148,9 +148,9 @@ export default function CustomersTable() {
                   <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
                     Store URL
                   </TableHead>
-                  <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
+                  {/* <TableHead className="px-3 sm:px-4 py-2 sm:py-3 text-gray-700 text-xs sm:text-sm font-semibold">
                     Actions
-                  </TableHead>
+                  </TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -212,9 +212,9 @@ export default function CustomersTable() {
                           {customer.storeUrl}
                         </a>
                       </TableCell>
-                      <TableCell className="px-3 sm:px-4 py-2 sm:py-3">
+                      {/* <TableCell className="px-3 sm:px-4 py-2 sm:py-3">
                         <div className="flex flex-col sm:flex-row gap-2">
-                          {/* <Button
+                          <Button
                             onClick={() =>
                               window.open(customer?.storeUrl, "_blank")
                             }
@@ -252,7 +252,7 @@ export default function CustomersTable() {
                             className="bg-blue-600 cursor-pointer text-white w-full sm:w-auto"
                           >
                             Edit
-                          </Button> */}
+                          </Button>
                           <Button
                             className="bg-blue-600 cursor-pointer text-white w-full sm:w-auto"
                             onClick={() => handleDownload(customer.storeName)}
@@ -261,7 +261,7 @@ export default function CustomersTable() {
                             Download
                           </Button>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))
                 )}
