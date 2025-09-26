@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 
 interface Store {
@@ -38,7 +38,7 @@ export default function CustomersTable() {
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  // const router = useRouter();
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -214,7 +214,7 @@ export default function CustomersTable() {
                       </TableCell>
                       <TableCell className="px-3 sm:px-4 py-2 sm:py-3">
                         <div className="flex flex-col sm:flex-row gap-2">
-                          <Button
+                          {/* <Button
                             onClick={() =>
                               window.open(customer?.storeUrl, "_blank")
                             }
@@ -252,7 +252,7 @@ export default function CustomersTable() {
                             className="bg-blue-600 cursor-pointer text-white w-full sm:w-auto"
                           >
                             Edit
-                          </Button>
+                          </Button> */}
                           <Button
                             className="bg-blue-600 cursor-pointer text-white w-full sm:w-auto"
                             onClick={() => handleDownload(customer.storeName)}
